@@ -10,3 +10,6 @@ test.c
 #exec
 a.out
 ircserv
+client
+server
+bircd
