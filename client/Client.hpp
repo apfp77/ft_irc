@@ -5,9 +5,12 @@
 
 class Client {
 	private:
+		/*
+			권한
+		*/
 		bool type;
 		/*
-			nick_name = duplicate check
+			nick_name 중복체크
 		*/
 		std::string nick_name;
 		std::string user_name;
