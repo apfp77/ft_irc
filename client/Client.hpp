@@ -6,10 +6,6 @@
 class Client {
 	private:
 		/*
-			권한
-		*/
-		bool type;
-		/*
 			nick_name 중복체크
 		*/
 		std::string nick_name;

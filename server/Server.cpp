@@ -8,12 +8,12 @@ Server::Server(char *port, char *passwd) : passwd(passwd)
 	ss >> this->port;
 }
 
-void Server::set_socket(int socket_fd)
+void Server::set_socket(int server_socket_fd)
 {
-	this->socket_fd = socket_fd;
+	this->server_socket_fd = server_socket_fd;
 }
 
 int Server::get_socket() const
 {
-	return (this->socket_fd);
+	return (this->server_socket_fd);
 }
