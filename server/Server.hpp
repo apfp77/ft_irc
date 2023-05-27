@@ -6,6 +6,11 @@
 #include <string>
 #include <map>
 
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
 class Server {
 	private:
 		int server_socket_fd;
@@ -16,7 +21,9 @@ class Server {
 			map["채널명"]으로 접속하기 위함
 		*/
 		std::map<std::string, Channel *> map;
+
 	public:
+		std::vector<Client *>cli_vector;
 		Server(char *port, char *passwd);
 		void set_socket(int socker_fd);
 		int get_socket() const;

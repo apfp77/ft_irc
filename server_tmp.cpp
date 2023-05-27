@@ -97,7 +97,7 @@ int main(int argc, char const **argv)
 			{
 				fprintf(stderr, "Too many clients, connection rejected\n");
 				close(newClientSocket);
-			} 
+			}
 			else 
 			{
 				if (i + 1 > nfds) 

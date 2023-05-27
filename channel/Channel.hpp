@@ -26,10 +26,10 @@ class Channel {
 			Limechat 에서는 지우는 명령어가 없고 irssi -delete옵션을 넣으면 지워짐
 		*/
 		std::string topic_message;
-    bool mode_invite = false;
-		bool mode_topic = false;
-		bool mode_key = false;
-		bool mode_limit = false;
+    bool mode_invite;
+		bool mode_topic;
+		bool mode_key;
+		bool mode_limit;
 
 	public:
 		std::string &get_topic() const;

@@ -4,7 +4,7 @@
 
 Server::Server(char *port, char *passwd) : passwd(passwd)
 {
-	std::stringstream ss;
+	std::stringstream ss(port);
 	ss >> this->port;
 }
 
@@ -17,3 +17,5 @@ int Server::get_socket() const
 {
 	return (this->server_socket_fd);
 }
+
+Server::~Server(){}
