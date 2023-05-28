@@ -2,7 +2,8 @@
 #define CHANNEL_HPP
 
 #include <iostream>
-#include "Client.hpp"
+#include "Mode.hpp"
+// #include "Client.hpp"
 #include <vector>
 #include <map>
 
@@ -13,9 +14,6 @@
 /*
 	없다면 에러전송
 */
-
-
-
 class Channel {
 	private:
 		std::string channel_name;
@@ -26,10 +24,7 @@ class Channel {
 			Limechat 에서는 지우는 명령어가 없고 irssi -delete옵션을 넣으면 지워짐
 		*/
 		std::string topic_message;
-    bool mode_invite;
-		bool mode_topic;
-		bool mode_key;
-		bool mode_limit;
+		Mode mode;
 
 	public:
 		std::string &get_topic() const;
@@ -37,6 +32,5 @@ class Channel {
 		Channel(std::string);
 		~Channel();
 };
-
 
 #endif

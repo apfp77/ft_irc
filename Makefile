@@ -3,7 +3,7 @@ CXX := c++
 CXXFLAGS := -Wextra -Werror -Wall -std=c++98
 
 SERVER_DIR:= server
-SERVER_SRCS:= Server.cpp
+SERVER_SRCS:= Server.cpp 
 SERVER_OBJS := $(addprefix $(SERVER_DIR)/,$(SERVER_SRCS:.cpp=.o))
 
 
@@ -13,7 +13,7 @@ CLIENT_OBJS := $(CLIENT_DIR/CLIENT_SRCS:%.cpp=%.o)
 CLIENT_OBJS := $(addprefix $(CLIENT_DIR)/,$(CLIENT_SRCS:.cpp=.o))
 
 CHANNEL_DIR:= channel
-CHANNEL_SRCS:= Channel.cpp
+CHANNEL_SRCS:= Channel.cpp Mode.cpp
 CHANNEL_OBJS := $(addprefix $(CHANNEL_DIR)/,$(CHANNEL_SRCS:.cpp=.o))
 
 PARSE_DIR:= parse

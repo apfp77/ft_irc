@@ -2,20 +2,41 @@
 //stringstream
 #include <sstream>
 
-Server::Server(char *port, char *passwd) : passwd(passwd)
+
+#define one "PING"
+
+
+
+Server::Server(char *srv_port, char *passwd) : passwd(passwd)
 {
-	std::stringstream ss(port);
-	ss >> this->port;
+	parse_map["PING"] = 1;
+	parse_map["PASS"] = 2;
+	parse_map["NICK"] = 3;
+	parse_map["NAME"] = 4;
+	parse_map["PRIVMSG"] = 5;
+	parse_map["TOPIC"] = 6;
+	parse_map["JOIN"] = 7;
+	parse_map["MODE"] = 8;
+	parse_map["KICK"] = 9;
+
+	std::stringstream ss(srv_port);
+	ss >> this->srv_port;
 }
 
-void Server::set_socket(int server_socket_fd)
+void Server::set_socket(int srv_sock)
 {
-	this->server_socket_fd = server_socket_fd;
+	this->srv_sock = srv_sock;
 }
 
 int Server::get_socket() const
 {
-	return (this->server_socket_fd);
+	return (this->srv_sock);
 }
+
+int Server::get_cmd(const char *s)
+{
+	return (this->parse_map[s]);
+}
+
 
 Server::~Server(){}

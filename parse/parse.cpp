@@ -48,31 +48,33 @@ void parse(std::string recv, Client *cli, Server &serv)
 		4. kick
 		5. PRIVMSG
 		6. 그 외는 에러
+
+	비밀번호 먼저 체크 후 접속 남은 명령어 수행
+	PING, TOPIC, JOIN, MODE, PRIVMSG, KICK, NICK
 	*/
 	std::vector <std::string> recv_vector = split(recv, ' ');
-	if (!recv_vector[0].compare("PING"))
+	switch(serv.get_cmd(recv_vector[0].c_str()))
 	{
-		
+		case PING:
+			break;
+		case PASS:
+			break;
+		case NICK:
+			break;
+		case NAME:
+			break;
+		case PRIVMSG:
+			break;
+		case TOPIC:
+			break;
+		case JOIN:
+			break;
+		case MODE:
+			break;
+		case KICK:
+			break;
+		default:
+			ft_send(ERR_NOTREGISTERED, ":You have not registered", cli);
+			break;
 	}
-	else if (!recv_vector[0].compare("TOPIC"))
-	{
-
-	}
-	else if (!recv_vector[0].compare("MODE"))
-	{
-
-	}
-	else if (!recv_vector[0].compare("KICK"))
-	{
-
-	}
-	else if (!recv_vector[0].compare("PRIVMSG"))
-	{
-
-	}
-	else
-	{
-		ft_send(ERR_NEEDMOREPARAMS, "Error: :Unknown command", cli);
-	}
-	(void)serv;
 }

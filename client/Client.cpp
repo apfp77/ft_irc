@@ -1,12 +1,15 @@
 #include "Client.hpp"
 
 
-Client::Client(){}
+Client::Client()
+{
+	pass_flag = false;
+}
 
 int Client::get_socket() const
 {
-	return (this->socket_fd);
+	return (this->cli_sock);
 }
 
-void Client::set_socket(int socket_fd)
-{ this->socket_fd = socket_fd; }
+void Client::set_socket(int cli_sock)
+{ this->cli_sock = cli_sock; }

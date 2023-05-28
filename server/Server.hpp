@@ -13,22 +13,22 @@
 
 class Server {
 	private:
-		int server_socket_fd;
-		int port;
+		int srv_sock;
+		int srv_port;
 		char *passwd;
-		/*
-			채널 이름과 채널포인터
-			map["채널명"]으로 접속하기 위함
-		*/
-		std::map<std::string, Channel *> map;
+		struct sockaddr_in serv_addr;
+		std::map<std::string, Channel*> ch_map;
+		std::map<std::string, Client *> cli_map;
+		std::map<const char *, int> parse_map;
 
 	public:
 		std::vector<Client *>cli_vector;
-		Server(char *port, char *passwd);
+		Server(char *srv_port, char *passwd);
 		void set_socket(int socker_fd);
 		int get_socket() const;
 		Channel *get_channel(std::string &channel_name);
 		void set_channel(std::string &channel_name);
+		int get_cmd(const char *s);
 		~Server();
 };
 
