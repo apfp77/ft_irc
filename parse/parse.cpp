@@ -37,6 +37,76 @@ void ft_send(std::string code, std::string s, Client *cli)
 	}
 }
 
+void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	if (cli->pass_flag)
+	{
+
+	}
+	if (recv_vector[1].compare(serv.get_passwd()))
+	{
+
+	}
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_name(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
 
 void parse(std::string recv, Client *cli, Server &serv)
 {
@@ -56,22 +126,31 @@ void parse(std::string recv, Client *cli, Server &serv)
 	switch(serv.get_cmd(recv_vector[0].c_str()))
 	{
 		case PING:
+			ft_ping(recv_vector, cli, serv);
 			break;
 		case PASS:
+			ft_pass(recv_vector, cli, serv);
 			break;
 		case NICK:
+			ft_nick(recv_vector, cli, serv);
 			break;
 		case NAME:
+			ft_name(recv_vector, cli, serv);
 			break;
 		case PRIVMSG:
+			ft_privmsg(recv_vector, cli, serv);
 			break;
 		case TOPIC:
+			ft_topic(recv_vector, cli, serv);
 			break;
 		case JOIN:
+			ft_join(recv_vector, cli, serv);
 			break;
 		case MODE:
+			ft_mode(recv_vector, cli, serv);
 			break;
 		case KICK:
+			ft_kick(recv_vector, cli, serv);
 			break;
 		default:
 			ft_send(ERR_NOTREGISTERED, ":You have not registered", cli);

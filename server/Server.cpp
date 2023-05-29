@@ -18,20 +18,12 @@ Server::Server(char *srv_port, char *passwd) : passwd(passwd)
 	ss >> this->srv_port;
 }
 
-void Server::set_socket(int srv_sock)
-{
-	this->srv_sock = srv_sock;
-}
+void Server::set_socket(int srv_sock){	this->srv_sock = srv_sock; }
 
-int Server::get_socket() const
-{
-	return (this->srv_sock);
-}
+int Server::get_socket() const{ 	return (this->srv_sock); }
 
-int Server::get_cmd(const char *s)
-{
-	return (this->parse_map[s]);
-}
+int Server::get_cmd(const char *s){	return (this->parse_map[s]); }
 
+char* Server::get_passwd() const { return (this->passwd); }
 
 Server::~Server(){}

@@ -32,6 +32,7 @@ class Server {
 		Channel *get_channel(std::string &channel_name);
 		void set_channel(std::string &channel_name);
 		int get_cmd(const char *s);
+		char *get_passwd() const;
 		~Server();
 };
 

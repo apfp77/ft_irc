@@ -2,6 +2,7 @@
 #define PARSE_HPP
 
 #include "Server.hpp"
+#include <vector>
 
 #define PING 1
 #define PASS 2
@@ -16,5 +17,14 @@
 
 
 void parse(std::string recv, Client *cli, Server &serv);
+void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_name(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 
 #endif
