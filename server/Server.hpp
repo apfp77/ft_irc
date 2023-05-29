@@ -4,8 +4,11 @@
 #include <iostream>
 #include <Channel.hpp>
 #include <string>
+#include <set>
 #include <map>
 
+// ㅌㅔ스트용
+#include <vector>
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -17,8 +20,8 @@ class Server {
 		int srv_port;
 		char *passwd;
 		struct sockaddr_in serv_addr;
-		std::map<std::string, Channel*> ch_map;
-		std::map<std::string, Client *> cli_map;
+		std::set<Channel *> ch_set;
+		std::set<Client *> cli_set;
 		std::map<const char *, int> parse_map;
 
 	public:

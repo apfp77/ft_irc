@@ -2,11 +2,6 @@
 //stringstream
 #include <sstream>
 
-
-#define one "PING"
-
-
-
 Server::Server(char *srv_port, char *passwd) : passwd(passwd)
 {
 	parse_map["PING"] = 1;

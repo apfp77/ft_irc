@@ -2,7 +2,7 @@
 #define MODE_HPP
 
 #include <iostream>
-#include <map>
+#include <set>
 #include "Client.hpp"
 
 class Mode {
@@ -18,7 +18,8 @@ class Mode {
 		/*
 			초대를 받은 클라이언트 리스트, 운영자는 기본적으로 포함해야함
 		*/
-		std::map<std::string, Client *> invite_cli_map;
+		std::set<std::string> invite_cli_set;
+		// std::map<std::string, Client *> invite_cli_map;
 
 		/*
 			클라이언트 제한 수

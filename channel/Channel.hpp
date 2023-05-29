@@ -4,8 +4,8 @@
 #include <iostream>
 #include "Mode.hpp"
 // #include "Client.hpp"
-#include <vector>
-#include <map>
+#include <set>
+
 
 
 /*
@@ -16,9 +16,9 @@
 */
 class Channel {
 	private:
-		std::string channel_name;
-		std::vector<Client *> client_lst;
-		std::vector<Client *> gm_lst;
+		std::string ch_name;
+		std::set<Client *> cli_lst;
+		std::set<Client *> gm_lst;
 		std::string passwd;
 		/*
 			Limechat 에서는 지우는 명령어가 없고 irssi -delete옵션을 넣으면 지워짐
@@ -28,7 +28,7 @@ class Channel {
 
 	public:
 		std::string &get_topic() const;
-		void set_topic(Client *client, std::string &new_message);
+		void set_topic(Client *cli, std::string &new_message);
 		Channel(std::string);
 		~Channel();
 };
