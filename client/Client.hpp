@@ -14,9 +14,10 @@ class Client {
 		*/
 		std::string nick_name;
 		std::string user_name;
+		
 		int cli_sock;
-		struct sockaddr_in clnt_addr;
-		socklen_t clnt_addr_size;
+		// struct sockaddr_in clnt_addr;
+		// socklen_t clnt_addr_size;
 
 	public:
 	/*
@@ -27,6 +28,8 @@ class Client {
 		socklen_t cli_sockaddr_l;
 		int get_socket() const;
 		void set_socket(int cli_sock);
+		void set_nick_name(std::string &nick_name);
+		std::string get_nick_name() const;
 		Client();
 		~Client();
 };

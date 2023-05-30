@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 					close(fds[i].fd);
 					fds[i].fd = -1;
 				}
-				else
+				else if (bytesRead > 0)
 				{
 					parse(buffer, server.cli_vector[i - 1], server);
 				}

@@ -2,7 +2,10 @@
 #define PARSE_HPP
 
 #include "Server.hpp"
+#include <unistd.h>
 #include <vector>
+//isalnum
+#include <ctype.h>
 
 #define PING 1
 #define PASS 2
