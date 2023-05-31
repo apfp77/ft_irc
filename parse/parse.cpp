@@ -25,7 +25,7 @@ std::vector <std::string> split(std::string &s, char c)
 
 void ft_send(std::string code, std::string s, Client *cli)
 {
-	std::string ret = code + s + "\r\n";
+	std::string ret = code + " " + s + "\r\n";
 	int check = send(cli->get_socket(), ret.c_str(), ret.length(), 0);
 	if (check == -1) { 
 		std::cerr << "Failed to send data" << std::endl;
@@ -38,7 +38,7 @@ void ft_send(std::string code, std::string s, Client *cli)
 void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	if (cli->pass_flag == true)
-		ft_send(ERR_ALREADYREGISTERED, "::You may not reregister", cli);
+		ft_send(ERR_ALREADYREGISTERED, ":You may not reregister", cli);
 	if (recv_vector.size() == 2 && !recv_vector[1].compare(serv.get_passwd()))
 	{
 		cli->pass_flag = true;
@@ -131,11 +131,11 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-	for (int i = 0; recv_vector.size(); i++)
+	if (recv_vector.size() < 1 || !(serv.get_channel(recv_vector[1])))
 	{
-		std::cout << recv_vector[i] << '\n';
+		ft_send(ERR_NOSUCHCHANNEL, ":No such channel" + recv_vector[1] , cli);
+		return ;
 	}
-	
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -158,19 +158,24 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 void parse(std::string recv, Client *cli, Server &serv)
 {
 	/*
-		recv 파싱
-		1. ping                                                                                                                                         
-		2. topic
-		3. mode
-		4. kick
-		5. PRIVMSG
-		6. 그 외는 에러
+		irssi - 서버접근 순서
+		CAP LS 302
+		JOIN :
+		
+
 
 	비밀번호 먼저 체크 후 접속 남은 명령어 수행
 	PING, TOPIC, JOIN, MODE, PRIVMSG, KICK, NICK
 	*/
 	std::vector <std::string> recv_vector = split(recv, ' ');
-	std::cout << recv_vector[0].c_str() << '\n';
+	/*
+		문자 타입을 지정, 첫번째 명령어는 커맨드, #과 +는 채널,
+	*/
+	if (cli->pass_flag == false &&  recv_vector[0] != "PASS" && cli->get_nick_name() == "")
+	{
+		ft_send(ERR_NOTREGISTERED, ":You have not registered", cli);
+		return ;
+	}
 	switch(serv.get_cmd(recv_vector[0].c_str()))
 	{
 		case PING:

@@ -143,6 +143,7 @@ int main(int argc, char **argv)
 				}
 				else if (bytesRead > 0)
 				{
+					// std::cout << "??" << '\n';
 					parse(buffer, server.cli_vector[i - 1], server);
 				}
 			}

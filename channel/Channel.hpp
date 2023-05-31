@@ -27,8 +27,10 @@ class Channel {
 		Mode mode;
 
 	public:
-		std::string &get_topic() const;
+		std::string get_topic() const;
+		std::string get_ch_name() const;
 		void set_topic(Client *cli, std::string &new_message);
+
 		Channel(std::string);
 		~Channel();
 };
