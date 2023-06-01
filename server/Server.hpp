@@ -29,7 +29,7 @@ class Server {
 		Server(char *srv_port, char *passwd);
 		void set_socket(int socker_fd);
 		int get_socket() const;
-		Channel* get_channel(std::string &channel_name);
+		Channel* find_ch_with_nick_name(std::string &channel_name);
 		void set_channel(std::string &channel_name);
 		int get_cmd(std::string s);
 		char* get_passwd() const;

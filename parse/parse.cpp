@@ -51,9 +51,9 @@ void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		ft_send(ERR_NEEDMOREPARAMS, ":Not enough parameters", cli);
 	else
 		ft_send(ERR_PASSWDMISMATCH, ":Password incorrect", cli);
-	close(cli->get_socket());
-	delete cli;
-	(void)serv;
+	/*
+		연결 끊는 작업필요, close(소켓) delete cli, pollfd 처리까지
+	*/
 }
 
 void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
@@ -64,8 +64,12 @@ void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		return ;
 	}
 	std::string ret = "PONG " + recv_vector[1] + "\r\n";
-	send(cli->get_socket(), ret.c_str(), ret.length(), 0);
-	(void)cli;
+	if (send(cli->get_socket(), ret.c_str(), ret.length(), 0) == -1)
+	{
+		/*
+			연결 끊는 작업필요, close(소켓) delete cli, pollfd 처리까지
+		*/
+	}
 	(void)serv;
 }
 
@@ -85,7 +89,7 @@ void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	/*
 		매개변수가 없는경우
-		ERR_NONICKNAMEGIVEN
+		ERR_NO`GIVEN
 	*/
 	/*
 		nick에 허용하지 않는 문자가 포함될 경우
@@ -120,10 +124,62 @@ void ft_name(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
+/*
+	PASS를 통과하지 못하면 서버와의 연결을 끊어버린다
+*/
+
+
 void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	/*
+		ERR_NOSUCHNICK (401) : 닉네임이 x
+		ERR_CANNOTSENDTOCHAN (404) : 사용자의 메세지를 채널에 전달하지 못할경우 사용됨
+		ERR_TOOMANYTARGETS (407) : 아규먼트가 많은 경우 발생 (irc protocol에 privmsg에 써있지만 정의되어 있지않음)
+		ERR_NORECIPIENT (411) : 수신자가 없는경우 (채널, 클라이언트가 안써있는 경우)
+		ERR_NOTEXTTOSEND (412) : 보낼 텍스트가 없는 경우
+		ERR_NOTOPLEVEL (413) : 서버차원에서 최상위
+		ERR_WILDTOPLEVEL (414) : 와일드카드 관련 에러
+		RPL_AWAY (301) : 사용자가 자리비움인경우
+	*/
+	/*
+		irssi) PRIVMSG #channel :test
+		limechat) PRIVMSG #channel test
+		limechat은 문자열을 평문으로 보내고irssi는 :를 붙인다
+		첫번째만 확인하고 나머진 문자열로 취급하나 2번째 인덱스의 첫 문자가 :인경우를 제외시킨다
+	*/
+	if (recv_vector.size() < 3)
+	{
+		ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli);
+	}
+	else if (recv_vector[1][0] == '#')
+	{
+		Channel *ch = serv.find_ch_with_nick_name(recv_vector[1]);
+		if (ch == NULL || ch->find_cli_in_ch(recv_vector[1]) == NULL)
+		{
+			ft_send(ERR_CANNOTSENDTOCHAN, ":Cannot send to channel", cli);
+			return ;
+		}
+		/*
+			채널에 가입한 클라이언트에 전송
+		*/
+	}
+	else if (recv_vector[1][0] == '@')
+	{
+		Client *cli = serv.find_cli_with_nick_name(recv_vector[1]);
+		if (cli == NULL)
+		{
+			ft_send(ERR_NOSUCHNICK, ":No such nick/channel", cli);
+			return ;
+		}
+		/*
+			문자열 합쳐서 해당 클라이언트에 보내기
+		*/
+	}
+	else
+	{
+		ft_send(ERR_NORECIPIENT, ":No recipient given", cli);
+	}
 	(void)recv_vector;
-	(void)cli;
 	(void)serv;
 }
 
@@ -136,7 +192,7 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-	if (recv_vector.size() < 1 || !(serv.get_channel(recv_vector[1])))
+	if (recv_vector.size() < 1 || !(serv.find_ch_with_nick_name(recv_vector[1])))
 	{
 		ft_send(ERR_NOSUCHCHANNEL, ":No such channel" + recv_vector[1] , cli);
 		return ;
@@ -161,9 +217,15 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
+/*
+	irssi에서 초기 접근 순서
+	1. CAP LS 302
+	2. PASS
+	3. NICK
+	4. USER
+*/
 void parse(std::string recv, Client *cli, Server &serv)
 {
-
 	std::vector <std::vector<std::string> > parse_split;
 	std::vector <std::string> recv_vector;
 	recv_vector = split(recv, "\r\n");

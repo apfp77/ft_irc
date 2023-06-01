@@ -41,7 +41,7 @@ Client* Server::find_cli_with_nick_name(std::string &nick_name)
 	return (NULL);
 }
 
-Channel* Server::get_channel(std::string &channel_name)
+Channel* Server::find_ch_with_nick_name(std::string &channel_name)
 {
 	std::set<Channel *>::iterator it = this->ch_set.begin();
 	for (; it != this->ch_set.end(); ++it)
