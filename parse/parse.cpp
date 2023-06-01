@@ -1,25 +1,24 @@
 #include "parse.hpp"
 #include "Numerics.hpp"
 
-std::vector <std::string> split(std::string &s, char c)
+std::vector <std::string> split(std::string &str, std::string delimiter)
 {
 	std::vector <std::string>ret;
-	int i = 0;
-	std::string tmp = "";
+	std::string::size_type i = 0;
+	std::string::size_type tmp_i = 0;
+	std::string::size_type str_size = str.length();
 
-	while (s[i])
+	while (tmp_i != str_size)
 	{
-		if (s[i] == c && tmp.compare(""))
-		{
-			ret.push_back(tmp);
-			tmp = "";
-		}
-		else if (s[i] != c)
-			tmp += s[i];
-		i++;
+		i = tmp_i;
+		i = str.find(delimiter, i);
+		if (i == std::string::npos)
+			break;
+		ret.push_back(str.substr(tmp_i ,i - tmp_i));
+		tmp_i = i + delimiter.length();
 	}
-	if (tmp.compare(""))
-			ret.push_back(tmp);
+	if (tmp_i != str_size)
+		ret.push_back(str.substr(tmp_i ,str_size - tmp_i));
 	return (ret);
 }
 
@@ -27,7 +26,8 @@ void ft_send(std::string code, std::string s, Client *cli)
 {
 	std::string ret = code + " " + s + "\r\n";
 	int check = send(cli->get_socket(), ret.c_str(), ret.length(), 0);
-	if (check == -1) { 
+	if (check == -1)
+	{ 
 		std::cerr << "Failed to send data" << std::endl;
 		/*
 			클라이언트 클래스 해제
@@ -58,8 +58,13 @@ void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-
-	(void)recv_vector;
+	if (recv_vector.size() != 2)
+	{
+		ft_send(ERR_NEEDMOREPARAMS, ":Not enough parameters", cli);
+		return ;
+	}
+	std::string ret = "PONG " + recv_vector[1] + "\r\n";
+	send(cli->get_socket(), ret.c_str(), ret.length(), 0);
 	(void)cli;
 	(void)serv;
 }
@@ -103,7 +108,7 @@ void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	else
 	{
 		if (cli->get_nick_name() == "")
-			ft_send(RPL_WELCOME, ":Welcome to the ft_irc Network" + recv_vector[1] , cli);
+			ft_send(RPL_WELCOME, ":Welcome to the ft_irc Network " + recv_vector[1] , cli);
 		cli->set_nick_name(recv_vector[1]);
 	}
 }
@@ -143,6 +148,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli);
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -157,56 +163,48 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void parse(std::string recv, Client *cli, Server &serv)
 {
-	/*
-		irssi - 서버접근 순서
-		CAP LS 302
-		JOIN :
-		
 
-
-	비밀번호 먼저 체크 후 접속 남은 명령어 수행
-	PING, TOPIC, JOIN, MODE, PRIVMSG, KICK, NICK
-	*/
-	std::vector <std::string> recv_vector = split(recv, ' ');
-	/*
-		문자 타입을 지정, 첫번째 명령어는 커맨드, #과 +는 채널,
-	*/
-	if (cli->pass_flag == false &&  recv_vector[0] != "PASS" && cli->get_nick_name() == "")
+	std::vector <std::vector<std::string> > parse_split;
+	std::vector <std::string> recv_vector;
+	recv_vector = split(recv, "\r\n");
+	for (std::vector<std::string>::size_type i = 0; i < recv_vector.size(); i++)
+		parse_split.push_back(split(recv_vector[i], " "));
+	recv_vector.clear();
+	for (std::vector <std::vector<std::string> >::size_type i = 0; i < parse_split.size(); i++)
 	{
-		ft_send(ERR_NOTREGISTERED, ":You have not registered", cli);
-		return ;
-	}
-	switch(serv.get_cmd(recv_vector[0].c_str()))
-	{
-		case PING:
-			ft_ping(recv_vector, cli, serv);
-			break;	
-		case PASS:
-			ft_pass(recv_vector, cli, serv);
-			break;
-		case NICK:
-			ft_nick(recv_vector, cli, serv);
-			break;
-		case NAME:
-			ft_name(recv_vector, cli, serv);
-			break;
-		case PRIVMSG:
-			ft_privmsg(recv_vector, cli, serv);
-			break;
-		case TOPIC:
-			ft_topic(recv_vector, cli, serv);
-			break;
-		case JOIN:
-			ft_join(recv_vector, cli, serv);
-			break;
-		case MODE:
-			ft_mode(recv_vector, cli, serv);
-			break;
-		case KICK:
-			ft_kick(recv_vector, cli, serv);
-			break;
-		default:
-			ft_send(ERR_NOTREGISTERED, ":You have not registered", cli);
-			break;
+		recv_vector = parse_split[i];
+		switch(serv.get_cmd(recv_vector[0].c_str()))
+		{
+			case PING:
+				ft_ping(recv_vector, cli, serv);
+				break;	
+			case PASS:
+				ft_pass(recv_vector, cli, serv);
+				break;
+			case NICK:
+				ft_nick(recv_vector, cli, serv);
+				break;
+			case NAME:
+				ft_name(recv_vector, cli, serv);
+				break;
+			case PRIVMSG:
+				ft_privmsg(recv_vector, cli, serv);
+				break;
+			case TOPIC:
+				ft_topic(recv_vector, cli, serv);
+				break;
+			case JOIN:
+				ft_join(recv_vector, cli, serv);
+				break;
+			case MODE:
+				ft_mode(recv_vector, cli, serv);
+				break;
+			case KICK:
+				ft_kick(recv_vector, cli, serv);
+				break;
+			default:
+				ft_send(ERR_NOTREGISTERED, ":You have not registered", cli);
+				break;
+		}
 	}
 }
