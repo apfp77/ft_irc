@@ -14,6 +14,14 @@
 	3. 채널에 가입한 사람이 없을경우 채널은 삭제된다
 */
 
+
+
+/*
+	채널 존재유무확인함수
+*/
+/*
+	없다면 에러전송
+*/
 class Channel {
 	private:
 		std::string ch_name;
