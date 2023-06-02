@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-std::vector <std::string> split(std::string &str, std::string delimiter)
+std::vector <std::string> ft_split(std::string &str, std::string delimiter)
 {
 	std::vector <std::string>ret;
 	std::string::size_type i = 0;
@@ -26,12 +26,12 @@ std::vector <std::string> split(std::string &str, std::string delimiter)
 int main(int argc, char const *argv[])
 {
 	std::string s = "PASS 4242\r\nNICK test7788\r\nUSER user 192.168.0.1 :test7788\r\n";
-	std::vector<std::string> recv_vector = split(s, "\r\n");
+	std::vector<std::string> recv_vector = ft_split(s, "\r\n");
 
 	
 	std::vector <std::vector<std::string> > a;
 	for (std::vector<std::string>::size_type i = 0; i < recv_vector.size(); i++)
-		a.push_back(split(recv_vector[i], " "));
+		a.push_back(ft_split(recv_vector[i], " "));
 	for (std::vector<std::vector<std::string> >::size_type i = 0; i < a.size(); i++)
 	{
 		// std::cout << a[i].size() << '\n';
