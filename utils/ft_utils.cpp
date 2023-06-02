@@ -1,0 +1,40 @@
+#include "ft_utils.hpp"
+
+void ft_send(std::string code, std::string s, Client *cli, bool err)
+{
+	std::string ret = "";
+	if (err)
+		ret += "ERROR ";
+	if (code.compare(""))
+		ret = code + " ";
+	ret = ret + s + "\r\n";
+	int check = send(cli->get_socket(), ret.c_str(), ret.length(), 0);
+	if (check == -1)
+	{ 
+		std::cerr << "Failed to send data" << std::endl;
+		/*
+			클라이언트 클래스 해제
+		*/
+	}
+}
+
+std::vector<std::string> ft_split(std::string &str, std::string delimiter)
+{
+	std::vector<std::string> ret;
+	std::string::size_type i = 0;
+	std::string::size_type tmp_i = 0;
+	std::string::size_type str_size = str.length();
+
+	while (tmp_i != str_size)
+	{
+		i = tmp_i;
+		i = str.find(delimiter, i);
+		if (i == std::string::npos)
+			break;
+		ret.push_back(str.substr(tmp_i ,i - tmp_i));
+		tmp_i = i + delimiter.length();
+	}
+	if (tmp_i != str_size)
+		ret.push_back(str.substr(tmp_i ,str_size - tmp_i));
+	return (ret);
+}

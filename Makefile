@@ -20,12 +20,16 @@ PARSE_DIR:= parse
 PARSE_SRCS:= parse.cpp
 PARSE_OBJS := $(addprefix $(PARSE_DIR)/,$(PARSE_SRCS:.cpp=.o))
 
+UTILS_DIR:= utils
+UTILS_SRCS:= ft_utils.cpp
+UTILS_OBJS := $(addprefix $(UTILS_DIR)/,$(UTILS_SRCS:.cpp=.o))
+
 INCLUDE:= -I $(SERVER_DIR) -I $(CLIENT_DIR) -I $(CHANNEL_DIR) -I $(PARSE_DIR) -I includes
 
 MAIN_SRCS := main.cpp
 MAIN_OBJS := $(MAIN_SRCS:%.cpp=%.o)
 
-OBJS:= $(MAIN_OBJS) $(SERVER_OBJS) $(CLIENT_OBJS) $(CHANNEL_OBJS) $(PARSE_OBJS)
+OBJS:= $(MAIN_OBJS) $(SERVER_OBJS) $(CLIENT_OBJS) $(CHANNEL_OBJS) $(PARSE_OBJS) $(UTILS_OBJS)
 
 RM := rm -f
 
