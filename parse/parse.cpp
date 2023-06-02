@@ -209,12 +209,18 @@ void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 /*
 	irssi에서 초기 접근 순서
 	1. CAP LS 302
-	2. PASS
+	2. PASS(인증)
 	3. NICK
 	4. USER
 */
 void parse(std::string recv, Client *cli, Server &serv)
 {
+	/*
+		Todo
+		인증 전에 PING과 QUIT, 등록되지 않은 명령어를 제외한 명령어가 들어오면
+			클라이언트와의 연결을 끊는다
+	*/
+	
 	std::vector <std::vector<std::string> > parse_split;
 	std::vector <std::string> recv_vector;
 	recv_vector = ft_split(recv, "\r\n");
@@ -254,6 +260,9 @@ void parse(std::string recv, Client *cli, Server &serv)
 				ft_kick(recv_vector, cli, serv);
 				break;
 			case QUIT:
+				ft_quit(recv_vector, cli, serv);
+				break;
+			case INVITE:
 				ft_quit(recv_vector, cli, serv);
 				break;
 			default:

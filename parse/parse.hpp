@@ -17,6 +17,7 @@
 #define MODE 8
 #define KICK 9
 #define QUIT 10
+#define INVITE 11
 
 
 
@@ -31,5 +32,6 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_invite(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 
 #endif

@@ -16,6 +16,7 @@ Server::Server(char *srv_port, char *passwd) : passwd(passwd)
 	parse_map["MODE"] = 8;
 	parse_map["KICK"] = 9;
 	parse_map["QUIT"] = 10;
+	parse_map["INVITE"] = 11;
 
 	std::stringstream ss(srv_port);
 	ss >> this->srv_port;
