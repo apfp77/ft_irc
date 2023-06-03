@@ -6,6 +6,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <poll.h>
 
 // ㅌㅔ스트용
 #include <vector>
@@ -13,6 +14,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+
+#define MAXCLIENT 20
 
 class Server {
 	private:
@@ -25,11 +28,11 @@ class Server {
 		std::map<std::string, int> parse_map;
 
 	public:
+		struct pollfd fds[MAXCLIENT + 1];
 		std::vector<Client *>cli_vector;
 		Server(char *srv_port, char *passwd);
 		void set_socket(int socker_fd);
 		int get_socket() const;
-		Channel* find_ch_with_ch_name(std::string &channel_name);
 		void set_channel(std::string &channel_name);
 		int get_cmd(std::string s);
 		char* get_passwd() const;
@@ -41,6 +44,7 @@ class Server {
 		void delete_ch(Channel *ch);
 
 		
+		Channel* find_ch_with_ch_name(std::string &channel_name);
 		Client* find_cli_with_nick_name(std::string &nick_name);
 
 

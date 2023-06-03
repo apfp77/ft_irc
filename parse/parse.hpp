@@ -25,7 +25,7 @@ void parse(std::string recv, Client *cli, Server &serv);
 void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
-void ft_name(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv);

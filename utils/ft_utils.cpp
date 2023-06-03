@@ -1,5 +1,17 @@
 #include "ft_utils.hpp"
 
+bool string_isalnum(std::string &s)
+{
+	if (s.length() == 0)
+		return (false);
+	for (int i = 0; s[i]; i++)
+	{
+		if (!std::isalnum(s[i]))
+			return (false);
+	}
+	return (true);
+}
+
 void ft_send(std::string code, std::string s, Client *cli, bool err)
 {
 	std::string ret = "";
@@ -37,4 +49,13 @@ std::vector<std::string> ft_split(std::string &str, std::string delimiter)
 	if (tmp_i != str_size)
 		ret.push_back(str.substr(tmp_i ,str_size - tmp_i));
 	return (ret);
+}
+
+int return_string_type(std::string &s)
+{
+	if (s[0] == '@')
+		return (USER);
+	else if (s[0] == '#')
+		return (CHANNEL);
+	return (STRING);
 }

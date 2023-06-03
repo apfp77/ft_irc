@@ -33,17 +33,6 @@ void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
-bool string_isalnum(std::string &s)
-{
-	if (s.length() == 0)
-		return (false);
-	for (int i = 0; s[i]; i++)
-	{
-		if (!std::isalnum(s[i]))
-			return (false);
-	}
-	return (true);
-}
 
 void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
@@ -73,7 +62,7 @@ void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 }
 
-void ft_name(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	(void)recv_vector;
 	(void)cli;
@@ -83,8 +72,6 @@ void ft_name(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 /*
 	PASS를 통과하지 못하면 서버와의 연결을 끊어버린다
 */
-
-
 void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	/*
@@ -109,10 +96,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	{
 		ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli, true);
 	}
-	/*
-		사용자가 채널일 경우
-	*/
-	else if (recv_vector[1][0] == '#')
+	else if (recv_vector[1][0] == CHANNEL)
 	{
 		std::string ch_name = recv_vector[1].substr(1);
 		Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
@@ -130,10 +114,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 			s += recv_vector[i];
 		privmsg_ch->send_to_ch(s);
 	}
-	/*
-		사용자가 대상일 경우
-	*/
-	else if (recv_vector[1][0] == '@')
+	else if (recv_vector[1][0] == USER)
 	{
 		std::string nick_name = recv_vector[1].substr(1);
 		Client *privmsg_cli = serv.find_cli_with_nick_name(nick_name);
@@ -186,6 +167,32 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	/*
+		요구사항에서 MODE는 채널 모드 변경만을 요구하므로 사용자는 해석할 수 없습니다
+	*/
+	/*
+		1. 채널이 아니거나 
+		2. 채널이 없거나 
+		3. 클라이언트에 권한이 없으면 에러
+	*/
+	std::vector<std::string>::size_type recv_size = recv_vector.size();
+	if (recv_size < 2 || return_string_type(recv_vector[1]) != CHANNEL || recv_vector[1][0] == '\0')
+	{
+		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
+		return ;
+	}
+	std::string ch_name = recv_vector[1].substr(1);
+	Channel *ch = serv.find_ch_with_ch_name(ch_name);
+	if (recv_size < 3)
+	{
+		ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
+		return ;
+	}
+
+	if ()
+
+
+	
 	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	(void)recv_vector;
 	(void)cli;
@@ -242,7 +249,7 @@ void parse(std::string recv, Client *cli, Server &serv)
 				ft_nick(recv_vector, cli, serv);
 				break;
 			case NAMES:
-				ft_name(recv_vector, cli, serv);
+				ft_names(recv_vector, cli, serv);
 				break;
 			case PRIVMSG:
 				ft_privmsg(recv_vector, cli, serv);
