@@ -22,16 +22,16 @@
 class Channel {
 	private:
 		std::string ch_name;
-		std::set<Client *> cli_lst;
 		std::set<Client *> gm_lst;
 		std::string passwd;
 		/*
 			Limechat 에서는 지우는 명령어가 없고 irssi -delete옵션을 넣으면 지워짐
 		*/
 		std::string topic_message;
-		Mode mode;
 
 	public:
+		std::set<Client *> cli_lst;
+		Mode mode;
 		Channel(std::string &ch_name, Client *cli);
 		~Channel();
 		std::string get_ch_name() const;

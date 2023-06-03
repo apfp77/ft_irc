@@ -27,10 +27,10 @@ class Mode {
 		int cli_limit;
 
 	public:
-		bool set_mode_invite(bool set);
-		bool set_mode_topic(bool set);
-		bool set_mode_key(bool set);
-		bool set_mode_limit(bool set);
+		void set_mode_invite(bool set);
+		void set_mode_topic(bool set);
+		void set_mode_key(bool set);
+		void set_mode_limit(bool set);
 		void set_cli_limit(int size);
 		void set_passwd(std::string &passwd);
 
