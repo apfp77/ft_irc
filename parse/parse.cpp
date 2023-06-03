@@ -188,10 +188,6 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
 		return ;
 	}
-
-	if ()
-
-
 	
 	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	(void)recv_vector;

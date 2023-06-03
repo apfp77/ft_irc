@@ -31,16 +31,19 @@ class Mode {
 		bool set_mode_topic(bool set);
 		bool set_mode_key(bool set);
 		bool set_mode_limit(bool set);
-		
+		void set_cli_limit(int size);
+		void set_passwd(std::string &passwd);
+
+
 		bool get_mode_invite() const;
 		bool get_mode_topic() const;
 		bool get_mode_key() const;
 		bool get_mode_limit() const;
-		void set_passwd(std::string &passwd);
+		int	get_cli_limit() const;
 		std::string get_passwd()const;
 
-		void insert_invite_cli(Client *);
-		void delete_invite_cli(Client *);
+		void insert_invite_cli(Client *cli);
+		void delete_invite_cli(Client *cli);
 
 		Mode();
 
