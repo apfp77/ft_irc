@@ -178,7 +178,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		return ;
 	}
 	Channel *join_ch = serv.find_ch_with_ch_name(recv_vector[1]);
-	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < join_ch->get_cli_lst_size())
+	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
 	{
 		ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
 		return ;
@@ -210,11 +210,11 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		return ;
 	}
 	std::string ch_name = recv_vector[1];
-	Channel *ch = serv.find_ch_with_ch_name(ch_name);
+	// Channel *ch = serv.find_ch_with_ch_name(ch_name);
 	/*
 		크기가 3이하거나 허용하지 않는 문자가 있을경우(+, -, 
 	*/
-	if (recv_size < 3 || ch->is_allow_option(recv_vector[2]))
+	// if (recv_size < 3 || ch->is_allow_option(recv_vector[2]))
 	{
 		ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
 		//RPL_CREATIONTIME (329): 채널생성 시간은 선택
