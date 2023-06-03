@@ -31,6 +31,8 @@ std::string Channel::get_passwd() const { return (this->passwd);}
 
 std::string Channel::get_ch_name() const {	return (this->ch_name); }
 
+std::set<Client *>::size_type Channel::get_cli_lst_size() const { return (this->cli_lst.size()); }
+
 Client* Channel::find_cli_in_ch(Client *cli)
 {
 	std::set<Client *>::iterator it = this->cli_lst.find(cli);

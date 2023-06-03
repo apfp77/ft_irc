@@ -145,6 +145,18 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	// ERR_NEEDMOREPARAMS (461)		-
+	// ERR_NOSUCHCHANNEL (403)
+	// ERR_TOOMANYCHANNELS (405)
+	// ERR_BADCHANNELKEY (475)		-
+	// ERR_BANNEDFROMCHAN (474)
+	// ERR_CHANNELISFULL (471)		-
+	// ERR_INVITEONLYCHAN (473)		-
+	// ERR_BADCHANMASK (476)
+	// RPL_TOPIC (332)
+	// RPL_TOPICWHOTIME (333)
+	// RPL_NAMREPLY (353)
+	// RPL_ENDOFNAMES (366)
 	/*
 		Todo
 		채널 생성시 서버에도 넣어주셔야해요
@@ -158,6 +170,22 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	if (recv_vector.size() < 1 || !(serv.find_ch_with_ch_name(recv_vector[1])))
 	{
 		ft_send(ERR_NOSUCHCHANNEL, ":No such channel" + recv_vector[1] , cli, true);
+		return ;
+	}
+	else if (recv_vector.size() < 2 || !(serv.find_ch_with_ch_name(recv_vector[1])))
+	{
+		ft_send(ERR_NEEDMOREPARAMS, "<command> :Not enough parameters", cli, true);
+		return ;
+	}
+	Channel *join_ch = serv.find_ch_with_ch_name(recv_vector[1]);
+	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < join_ch->get_cli_lst_size())
+	{
+		ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
+		return ;
+	}
+	else if (join_ch->get_mode_invite())
+	{
+		ft_send(ERR_INVITEONLYCHAN, join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
 		return ;
 	}
 	(void)recv_vector;
