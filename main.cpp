@@ -159,9 +159,5 @@ int main(int argc, char **argv)
 
 	// Close server socket
 	close(server_fd);
-
-
-
-
 	return 0;
 }

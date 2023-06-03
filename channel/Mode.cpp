@@ -10,10 +10,10 @@ Mode::Mode()
 	cli_limit = 0;
 }
 
-bool Mode::set_mode_invite(bool set) { this->mode_invite = set; }
-bool Mode::set_mode_topic(bool set) { this->mode_topic = set; }
-bool Mode::set_mode_key(bool set) { this->mode_key = set; }
-bool Mode::set_mode_limit(bool set) {this->mode_limit = set; }	
+void Mode::set_mode_invite(bool set) { this->mode_invite = set; }
+void Mode::set_mode_topic(bool set) { this->mode_topic = set; }
+void Mode::set_mode_key(bool set) { this->mode_key = set; }
+void Mode::set_mode_limit(bool set) {this->mode_limit = set; }	
 void Mode::set_cli_limit(int size) { this->cli_limit = size;}
 void Mode::set_passwd(std::string &passwd) { this->passwd = passwd; }
 
@@ -32,9 +32,9 @@ void Mode::insert_invite_cli(Client *cli)
 
 void Mode::delete_invite_cli(Client *cli)
 {
-	std::set<Client *>::iterator it = this->cli_lst.find(cli);
-	if (it != this->cli_lst.end())
-		this->cli_lst.erase(it);
+	std::set<Client *>::iterator it = this->invite_cli_set.find(cli);
+	if (it != this->invite_cli_set.end())
+		this->invite_cli_set.erase(it);
 }
 
 Mode::~Mode()

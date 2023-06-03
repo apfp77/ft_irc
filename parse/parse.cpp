@@ -98,7 +98,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	}
 	else if (recv_vector[1][0] == CHANNEL)
 	{
-		std::string ch_name = recv_vector[1].substr(1);
+		std::string ch_name = recv_vector[1];
 		Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
 		
 		//채널 이름이 없거나, 채널에 소속되지 않은 경우
@@ -181,11 +181,15 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
 		return ;
 	}
-	std::string ch_name = recv_vector[1].substr(1);
+	std::string ch_name = recv_vector[1];
 	Channel *ch = serv.find_ch_with_ch_name(ch_name);
-	if (recv_size < 3)
+	/*
+		크기가 3이하거나 허용하지 않는 문자가 있을경우(+, -, 
+	*/
+	if (recv_size < 3 || ch->is_allow_option(recv_vector[2]))
 	{
 		ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
+		//RPL_CREATIONTIME (329): 채널생성 시간은 선택
 		return ;
 	}
 	

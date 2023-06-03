@@ -5,7 +5,7 @@
 #include <set>
 #include "Client.hpp"
 
-class Mode {
+class Mode  {
 	private:
 		/*
 			o옵션은 Channel.hpp에서 gm_lst에서 뺴는걸로
@@ -27,10 +27,10 @@ class Mode {
 		int cli_limit;
 
 	public:
-		bool set_mode_invite(bool set);
-		bool set_mode_topic(bool set);
-		bool set_mode_key(bool set);
-		bool set_mode_limit(bool set);
+		void set_mode_invite(bool set);
+		void set_mode_topic(bool set);
+		void set_mode_key(bool set);
+		void set_mode_limit(bool set);
 		void set_cli_limit(int size);
 		void set_passwd(std::string &passwd);
 
@@ -44,6 +44,8 @@ class Mode {
 
 		void insert_invite_cli(Client *cli);
 		void delete_invite_cli(Client *cli);
+
+		bool is_allow_option(std::string &opt);
 
 		Mode();
 

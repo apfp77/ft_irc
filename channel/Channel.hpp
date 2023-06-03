@@ -19,7 +19,7 @@
 /*
 	없다면 에러전송
 */
-class Channel {
+class Channel : public Mode {
 	private:
 		std::string ch_name;
 		std::set<Client *> cli_lst;
@@ -29,7 +29,7 @@ class Channel {
 			Limechat 에서는 지우는 명령어가 없고 irssi -delete옵션을 넣으면 지워짐
 		*/
 		std::string topic_message;
-		Mode mode;
+		// Mode mode;
 
 	public:
 		Channel(std::string &ch_name, Client *cli);
