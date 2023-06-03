@@ -98,7 +98,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	}
 	else if (recv_vector[1][0] == CHANNEL)
 	{
-		std::string ch_name = recv_vector[1].substr(1);
+		std::string ch_name = recv_vector[1];
 		Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
 		
 		//채널 이름이 없거나, 채널에 소속되지 않은 경우
@@ -178,12 +178,12 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		return ;
 	}
 	Channel *join_ch = serv.find_ch_with_ch_name(recv_vector[1]);
-	if (join_ch->mode.get_cli_limit() > 0 && join_ch->mode.get_cli_limit() < join_ch->cli_lst.size())
+	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < join_ch->get_cli_lst_size())
 	{
 		ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
 		return ;
 	}
-	else if (join_ch->mode.get_mode_invite())
+	else if (join_ch->get_mode_invite())
 	{
 		ft_send(ERR_INVITEONLYCHAN, join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
 		return ;
@@ -203,19 +203,23 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		2. 채널이 없거나 
 		3. 클라이언트에 권한이 없으면 에러
 	*/
-	// std::vector<std::string>::size_type recv_size = recv_vector.size();
-	// if (recv_size < 2 || return_string_type(recv_vector[1]) != CHANNEL || recv_vector[1][0] == '\0')
-	// {
-	// 	ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
-	// 	return ;
-	// }
-	// std::string ch_name = recv_vector[1].substr(1);
-	// // Channel *ch = serv.find_ch_with_ch_name(ch_name);
-	// if (recv_size < 3)
-	// {
-	// 	ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
-	// 	return ;
-	// }
+	std::vector<std::string>::size_type recv_size = recv_vector.size();
+	if (recv_size < 2 || return_string_type(recv_vector[1]) != CHANNEL || recv_vector[1][0] == '\0')
+	{
+		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
+		return ;
+	}
+	std::string ch_name = recv_vector[1];
+	Channel *ch = serv.find_ch_with_ch_name(ch_name);
+	/*
+		크기가 3이하거나 허용하지 않는 문자가 있을경우(+, -, 
+	*/
+	if (recv_size < 3 || ch->is_allow_option(recv_vector[2]))
+	{
+		ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
+		//RPL_CREATIONTIME (329): 채널생성 시간은 선택
+		return ;
+	}
 	
 	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	(void)recv_vector;

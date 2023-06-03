@@ -5,7 +5,7 @@
 #include <set>
 #include "Client.hpp"
 
-class Mode {
+class Mode  {
 	private:
 		/*
 			o옵션은 Channel.hpp에서 gm_lst에서 뺴는걸로
@@ -44,6 +44,8 @@ class Mode {
 
 		void insert_invite_cli(Client *cli);
 		void delete_invite_cli(Client *cli);
+
+		bool is_allow_option(std::string &opt);
 
 		Mode();
 
