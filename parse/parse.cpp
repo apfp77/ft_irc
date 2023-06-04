@@ -178,15 +178,32 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		return ;
 	}
 	Channel *join_ch = serv.find_ch_with_ch_name(recv_vector[1]);
-	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
+	if (join_ch == NULL)
 	{
-		ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
-		return ;
+		join_ch = new Channel(recv_vector[1], cli);
+		join_ch->insert_cli(cli);
+		join_ch->insert_cli_gm(cli);
+		join_ch->set_passwd(recv_vector[2]);
+		serv.insert_ch(join_ch);
 	}
-	else if (join_ch->get_mode_invite())
+	else
 	{
-		ft_send(ERR_INVITEONLYCHAN, join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
-		return ;
+		if (join_ch->get_passwd() != recv_vector[2])
+		{
+			ft_send(ERR_BADCHANNELKEY, join_ch->get_ch_name() + " :Cannot join channel (+k)", cli, true);
+			return ;
+		}
+		else if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
+		{
+			ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
+			return ;
+		}
+		else if (join_ch->get_mode_invite())
+		{
+			ft_send(ERR_INVITEONLYCHAN, join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
+			return ;
+		}
+		join_ch->insert_cli(cli);
 	}
 	(void)recv_vector;
 	(void)cli;
