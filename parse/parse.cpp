@@ -96,7 +96,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	{
 		ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli, true);
 	}
-	else if (recv_vector[1][0] == CHANNEL)
+	else if (return_string_type(recv_vector[1]) == CHANNEL)
 	{
 		std::string ch_name = recv_vector[1];
 		Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
@@ -167,14 +167,14 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		Mode는 아직 구현안했어요
 	*/
 	
-	if (recv_vector.size() < 1 || !(serv.find_ch_with_ch_name(recv_vector[1])))
+	if (recv_vector.size() < 1)
 	{
 		ft_send(ERR_NOSUCHCHANNEL, ":No such channel" + recv_vector[1] , cli, true);
 		return ;
 	}
-	else if (recv_vector.size() < 2 || !(serv.find_ch_with_ch_name(recv_vector[1])))
+	else if (recv_vector.size() < 2)
 	{
-		ft_send(ERR_NEEDMOREPARAMS, "<command> :Not enough parameters", cli, true);
+		ft_send(ERR_NEEDMOREPARAMS, recv_vector[1] + " :Not enough parameters", cli, true);
 		return ;
 	}
 	Channel *join_ch = serv.find_ch_with_ch_name(recv_vector[1]);
@@ -237,8 +237,8 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		//RPL_CREATIONTIME (329): 채널생성 시간은 선택
 		return ;
 	}
-	
 	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
+	
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -260,6 +260,7 @@ void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
