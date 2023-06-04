@@ -178,7 +178,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		return ;
 	}
 	Channel *join_ch = serv.find_ch_with_ch_name(recv_vector[1]);
-	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < join_ch->get_cli_lst_size())
+	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
 	{
 		ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
 		return ;
