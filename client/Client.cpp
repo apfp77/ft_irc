@@ -23,7 +23,7 @@ int Client::append_submemory(char *str)
 	int idx;
 
 	this->sub_memory.append(str);
-	idx = sub_memory.find_last_of("/r/n");
+	idx = sub_memory.rfind("\r\n");
 	return (idx);
 }
 

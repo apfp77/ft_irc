@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <exception>
 
 //isdigit
 #include <cctype>
@@ -28,11 +29,9 @@ int main(int argc, char **argv)
 		server.make_event_window();
 		server.execute();
 	}
-
-	
 	catch (int a)
 	{
-		std::cout << "ERROR" << a << std::endl;
+		std::cout << "ERROR: " << a << std::endl;
 	}
 }
 	

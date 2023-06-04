@@ -1,6 +1,9 @@
+#ifndef PAR_HPP
+#define PAR_HPP
+#include <parse.hpp>
+#endif
 #ifndef SERVER_HPP
 #define SERVER_HPP
-
 #include <iostream>
 #include <Channel.hpp>
 #include <string>
@@ -10,8 +13,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-// ㅌㅔ스트용
-#include <vector>
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -44,7 +45,6 @@ class Server {
 		Client *find_client(int fd);
 		void message_receive(pollfd &fds);
 		// struct pollfd fds[MAXCLIENT + 1];
-		std::vector<Client *>cli_vector;
 		void set_socket(int socker_fd);
 		int get_socket() const;
 		void set_channel(std::string &channel_name);

@@ -26,10 +26,10 @@ Server::Server(char *srv_port, char *passwd) : passwd(passwd)
 		if (str.empty())
 			throw("empty passwd");
 		int len = str.length();
-		if (!(len > 5 && len < 11))
+		if (len < 1 || len > 11)
 			throw("len_worng passwd");
 	}
-	catch(char *str)
+	catch(const char *str)
 	{
 		std::cerr << str << std::endl;
 		throw (1);
@@ -51,6 +51,7 @@ void Server::parse_map_init()
 	parse_map["KICK"] = 9;
 	parse_map["QUIT"] = 10;
 	parse_map["INVITE"] = 11;
+	parse_map["CAP"] = 12;
 }
 
 void Server::init()
@@ -98,12 +99,12 @@ void Server::execute()
 	while (1)
 	{
 		int check = poll(fds, MAXCLIENT + 1, -1);
-		std::cout << "이벤트 발생" << std::endl;
+		// std::cout << "이벤트 발생" << std::endl;
 		if (check == -1)
 			throw("poll() error");
 		if (fds[0].revents & POLLIN)
 		{
-			std::cout << "연결했음" << std::endl;
+			// std::cout << "연결했음" << std::endl;
 			accept_client();
 		}
 		for (int i = 1; i < MAXCLIENT + 1; i++)
@@ -112,12 +113,12 @@ void Server::execute()
 				continue ;
 			if (fds[i].revents & POLLIN)
 			{
-				std::cout << "문자받음" << std::endl;
+				// std::cout << "문자받음" << std::endl;
 				message_receive(fds[i]);
 			}
 			if (fds[i].revents & POLLHUP || fds[i].revents & POLLERR)
 			{
-				std::cout << "클라이언트 지워짐" << std::endl;
+				// std::cout << "클라이언트 지워짐" << std::endl;
 				erase_clinet(fds[i]);
 			}
 		}
@@ -136,7 +137,7 @@ void Server::accept_client()
 	}
 	this->find_vacant_fds().fd = client->get_socket();
 	this->insert_cli(client);
-	std::cout << "생성된 클라이언트 소켓 " << client->get_socket() << std::endl;
+	// std::cout << "생성된 클라이언트 소켓 " << client->get_socket() << std::endl;
 }
 
 struct pollfd &Server::find_vacant_fds()
@@ -145,7 +146,7 @@ struct pollfd &Server::find_vacant_fds()
 	{
 		if (this->fds[i].fd == -1)
 		{
-			std::cout << i << "번째 fds 생성" << std::endl; // test용
+			// std::cout << i << "번째 fds 생성" << std::endl; // test용
 			this->fds[i].events = POLLIN | POLLERR | POLLHUP;
 			return (this->fds[i]);
 		}
@@ -157,13 +158,13 @@ void Server::erase_clinet(pollfd &fds)
 {
 	Client *client;
 	client = this->find_client(fds.fd);
-	delete_cli(client);
-	close(fds.fd);
 	/*
 		Todo
 		클라이언트 연쇄제거
 	*/
 	// delete client;
+	delete_cli(client);
+	close(fds.fd);
 	fds.fd = -1;
 	fds.events = 0;
 }
@@ -190,7 +191,10 @@ void Server::message_receive(pollfd &fds)
 	int idx;
 
 	message_size = recv(fds.fd, buffer, 1024, 0);
-	std::cout << "받은 문자" << buffer << std::endl;
+
+	if (message_size != -1)
+		buffer[message_size] = '\0';
+	// std::cout << "받은 문자" << buffer << std::endl;
 	if (message_size == -1)
 		throw (1);
 	client = this->find_client(fds.fd);
@@ -198,7 +202,8 @@ void Server::message_receive(pollfd &fds)
 	if (idx == -1)
 		return ;
 	message = client->division_cmd(idx);
-	std::cout << message << std::endl;
+	// std::cout << "message: " << message << '\n';
+	parse(message, client, *this);
 }
 
 void Server::insert_cli(Client *cli) { cli_set.insert(cli); }
