@@ -6,6 +6,9 @@
 #include <arpa/inet.h>
 #include <exception>
 
+//isdigit
+#include <cctype>
+
 #define ERROR 1
 
 #define MAX_CLIENTS 10

@@ -366,6 +366,13 @@ void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
+void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
 /*
 	irssi에서 초기 접근 순서
 	1. CAP LS 302
