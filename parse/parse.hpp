@@ -1,3 +1,4 @@
+
 #ifndef PARSE_HPP
 #define PARSE_HPP
 
@@ -18,6 +19,7 @@
 #define KICK 9
 #define QUIT 10
 #define INVITE 11
+#define CAP 12
 
 
 
@@ -33,5 +35,6 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_invite(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 
 #endif

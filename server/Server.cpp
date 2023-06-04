@@ -4,7 +4,41 @@
 
 #include <cstdlib>
 
+bool Server::is_num(char *s)
+{
+	int i = 0;
+	if (s[i] == '-' || !std::isdigit(s[i++]))
+		return (false);
+	while (s[i] && std::isdigit(s[i]))
+		i++;
+	if (s[i] == '\0')
+		return (true);
+	return (false);
+}
+
 Server::Server(char *srv_port, char *passwd) : passwd(passwd)
+{
+	try
+	{
+		if(this->is_num(srv_port) == false)
+			throw ("is not num");
+		std::string str = passwd;
+		if (str.empty())
+			throw("empty passwd");
+		int len = str.length();
+		if (len < 1 || len > 11)
+			throw("len_worng passwd");
+	}
+	catch(const char *str)
+	{
+		std::cerr << str << std::endl;
+		throw (1);
+	}
+	std::stringstream ss(srv_port);
+	ss >> this->srv_port;
+}
+
+void Server::parse_map_init()
 {
 	parse_map["PING"] = 1;
 	parse_map["PASS"] = 2;
@@ -17,9 +51,159 @@ Server::Server(char *srv_port, char *passwd) : passwd(passwd)
 	parse_map["KICK"] = 9;
 	parse_map["QUIT"] = 10;
 	parse_map["INVITE"] = 11;
+	parse_map["CAP"] = 12;
+}
 
-	std::stringstream ss(srv_port);
-	ss >> this->srv_port;
+void Server::init()
+{
+	this->srv_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (srv_sock == -1)
+		throw ("socket() error");
+	this->setting_socket(this->srv_sock);
+	this->serv_addr.sin_family = AF_INET;
+	this->serv_addr.sin_addr.s_addr = INADDR_ANY;
+	this->serv_addr.sin_port = htons(this->srv_port);
+
+	if (bind(this->srv_sock, reinterpret_cast<sockaddr*>(&serv_addr), sizeof(serv_addr)) == -1)
+	{
+		std::cerr << "bind() error" << std::endl;
+		throw (errno);
+	}
+	if (listen(this->srv_sock, 5) == -1)
+	{
+		std::cerr << "listen() error" << std::endl;
+		throw (errno);
+	}
+}
+
+void Server::setting_socket(int srv_sock)
+{
+	int value = 1;
+	if (setsockopt(srv_sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&value, sizeof(value)) == -1)
+		throw ("setsoctopt() error");
+	if (fcntl(srv_sock, F_SETFL, O_NONBLOCK) == -1)
+		throw ("fcntl() error");
+}
+
+void Server::make_event_window()
+{
+	fds[0].fd = this->srv_sock;
+	fds[0].events = POLLIN;
+	for (int i = 1; i < MAXCLIENT + 1; ++i)
+		fds[i].fd = -1;
+}
+
+void Server::execute()
+{
+	this->make_event_window();
+	while (1)
+	{
+		int check = poll(fds, MAXCLIENT + 1, -1);
+		// std::cout << "이벤트 발생" << std::endl;
+		if (check == -1)
+			throw("poll() error");
+		if (fds[0].revents & POLLIN)
+		{
+			// std::cout << "연결했음" << std::endl;
+			accept_client();
+		}
+		for (int i = 1; i < MAXCLIENT + 1; i++)
+		{
+			if (fds[i].fd == -1)
+				continue ;
+			if (fds[i].revents & POLLIN)
+			{
+				// std::cout << "문자받음" << std::endl;
+				message_receive(fds[i]);
+			}
+			if (fds[i].revents & POLLHUP || fds[i].revents & POLLERR)
+			{
+				// std::cout << "클라이언트 지워짐" << std::endl;
+				erase_clinet(fds[i]);
+			}
+		}
+	}
+}
+
+void Server::accept_client()
+{
+	Client *client = new Client;
+	client->set_socket(accept(this->srv_sock, \
+	reinterpret_cast<sockaddr*>(&client->get_cil_addr()), &(client->get_cli_size())));
+	if (client->get_socket() == -1)
+	{
+		delete client;
+		throw(1);
+	}
+	this->find_vacant_fds().fd = client->get_socket();
+	this->insert_cli(client);
+	// std::cout << "생성된 클라이언트 소켓 " << client->get_socket() << std::endl;
+}
+
+struct pollfd &Server::find_vacant_fds()
+{
+	for(int i = 1; i < MAXCLIENT + 1; i++)
+	{
+		if (this->fds[i].fd == -1)
+		{
+			// std::cout << i << "번째 fds 생성" << std::endl; // test용
+			this->fds[i].events = POLLIN | POLLERR | POLLHUP;
+			return (this->fds[i]);
+		}
+	}
+	return (this->fds[0]);
+}
+
+void Server::erase_clinet(pollfd &fds)
+{
+	Client *client;
+	client = this->find_client(fds.fd);
+	/*
+		Todo
+		클라이언트 연쇄제거
+	*/
+	// delete client;
+	delete_cli(client);
+	close(fds.fd);
+	fds.fd = -1;
+	fds.events = 0;
+}
+
+Client *Server::find_client(int fd)
+{
+	std::set<Client *>::iterator it = this->cli_set.begin();
+	for (; it != cli_set.end(); it++)
+	{
+		if( (*it)->get_socket() == fd)
+		{
+			return ((*it));
+		}
+	}
+	return (NULL);
+}
+
+void Server::message_receive(pollfd &fds)
+{
+	std::string message;
+	Client *client;
+	char buffer[1024];
+	int message_size = 0;
+	int idx;
+
+	message_size = recv(fds.fd, buffer, 1024, 0);
+
+	if (message_size != -1)
+		buffer[message_size] = '\0';
+	// std::cout << "받은 문자" << buffer << std::endl;
+	if (message_size == -1)
+		throw (1);
+	client = this->find_client(fds.fd);
+	idx = client->append_submemory(buffer);
+	if (idx == -1)
+		return ;
+	message = client->division_cmd(idx);
+	// std::cout << "message: " << message << '\n';
+	parse(message, client, *this);
 }
 
 void Server::insert_cli(Client *cli) { cli_set.insert(cli); }

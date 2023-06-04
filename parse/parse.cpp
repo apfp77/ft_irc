@@ -131,7 +131,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	}
 	else
 	{
-		std::cout << recv_vector[1] << '\n';
+		// std::cout << recv_vector[1] << '\n';
 		ft_send(ERR_NORECIPIENT, ":No recipient given", cli, true);
 	}
 }
@@ -241,6 +241,13 @@ void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
+void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
 /*
 	irssi에서 초기 접근 순서
 	1. CAP LS 302
@@ -299,6 +306,9 @@ void parse(std::string recv, Client *cli, Server &serv)
 				break;
 			case INVITE:
 				ft_quit(recv_vector, cli, serv);
+				break;
+			case CAP:
+				ft_cap(recv_vector, cli, serv);
 				break;
 			default:
 				ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);

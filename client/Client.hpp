@@ -5,6 +5,7 @@
 #include <poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 
 
 class Client {
@@ -16,16 +17,20 @@ class Client {
 		std::string user_name;
 		
 		int cli_sock;
-		// struct sockaddr_in clnt_addr;
-		// socklen_t clnt_addr_size;
+		struct sockaddr_in cli_sockaddr;
+		socklen_t cli_sockaddr_l;
+		std::string sub_memory;
 
 	public:
 	/*
 		cli_sockaddr, cli_sockaddr_l은 main.cpp에 테스트용으로 있음
 	*/
+		struct sockaddr_in &get_cil_addr();
+		socklen_t &get_cli_size();
+		void setting_socket(int srv_sock);
+		int append_submemory(char *str);
+		std::string division_cmd(int idx);
 		bool pass_flag;
-		struct sockaddr_in cli_sockaddr;
-		socklen_t cli_sockaddr_l;
 		int get_socket() const;
 		void set_socket(int cli_sock);
 		void set_nick_name(std::string &nick_name);

@@ -1,15 +1,18 @@
+#ifndef PAR_HPP
+#define PAR_HPP
+#include <parse.hpp>
+#endif
 #ifndef SERVER_HPP
 #define SERVER_HPP
-
 #include <iostream>
 #include <Channel.hpp>
 #include <string>
 #include <set>
 #include <map>
 #include <poll.h>
+#include <unistd.h>
+#include <fcntl.h>
 
-// ㅌㅔ스트용
-#include <vector>
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -22,15 +25,26 @@ class Server {
 		int srv_sock;
 		int srv_port;
 		char *passwd;
+		struct pollfd fds[MAXCLIENT + 1];
 		struct sockaddr_in serv_addr;
 		std::set<Channel *> ch_set;
 		std::set<Client *> cli_set;
 		std::map<std::string, int> parse_map;
+		void accept_client();
+		void erase_clinet(pollfd &fds);
 
 	public:
-		struct pollfd fds[MAXCLIENT + 1];
-		std::vector<Client *>cli_vector;
 		Server(char *srv_port, char *passwd);
+		bool is_num(char *s);
+		void parse_map_init();
+		void init();
+		void make_event_window();
+		void execute();
+		void setting_socket(int srv_sock);
+		struct pollfd &find_vacant_fds();
+		Client *find_client(int fd);
+		void message_receive(pollfd &fds);
+		// struct pollfd fds[MAXCLIENT + 1];
 		void set_socket(int socker_fd);
 		int get_socket() const;
 		void set_channel(std::string &channel_name);
