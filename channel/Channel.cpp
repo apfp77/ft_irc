@@ -41,11 +41,12 @@ Client* Channel::find_cli_in_ch(Client *cli)
 	return (NULL);
 }
 
-void Channel::send_to_ch(std::string &message)
+void Channel::send_to_ch(std::string &message, Client *cli)
 {
 	std::set<Client *>::iterator it = this->cli_lst.begin();
 	for (; it != this->cli_lst.end(); ++it)
 	{
-		ft_send("", message, (*it), false);
+		if ((*it) != cli)
+			ft_send("", message, (*it), false);
 	}
 }

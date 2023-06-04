@@ -42,7 +42,7 @@ class Channel : public Mode {
 		std::set<Client *>::size_type get_cli_lst_size() const;
 
 		Client* find_cli_in_ch(Client *cli);
-		void send_to_ch(std::string &message);
+		void send_to_ch(std::string &message, Client *cli);
 
 		void insert_cli(Client *cli);
 		void insert_cli_gm(Client *cli);
