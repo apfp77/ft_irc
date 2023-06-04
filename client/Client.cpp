@@ -8,6 +8,45 @@ Client::Client()
 	user_name = "";
 }
 
+struct sockaddr_in &Client::get_cil_addr()
+{
+	return (this->cli_sockaddr);
+}
+
+socklen_t &Client::get_cli_size()
+{
+	return (this->cli_sockaddr_l);
+}
+
+int Client::append_submemory(char *str)
+{
+	int idx;
+
+	this->sub_memory.append(str);
+	idx = sub_memory.find_last_of("/r/n");
+	return (idx);
+}
+
+std::string Client::division_cmd(int idx)
+{
+	std::string cmd_memory;
+
+	cmd_memory = this->sub_memory.substr(0, idx + 2);
+	this->sub_memory = this->sub_memory.substr(idx + 2);
+	return (cmd_memory);
+}
+
+void Client::setting_socket(int cli_sock)
+{
+	int value = 1;
+	if (setsockopt(cli_sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&value, sizeof(value)) == -1)
+		throw ("setsoctopt() error");
+	if (fcntl(cli_sock, F_SETFL, O_NONBLOCK) == -1)
+		throw ("fcntl() error");
+}
+
+socklen_t cli_sockaddr_l;
+
 int Client::get_socket() const { return (this->cli_sock); }
 
 void Client::set_socket(int cli_sock) { this->cli_sock = cli_sock; }
