@@ -55,7 +55,7 @@ int return_string_type(std::string &s)
 {
 	if (s[0] == '@')
 		return (USER);
-	else if (s[0] == '#')
+	else if (s[0] == '#' || s[0] == '&')
 		return (CHANNEL);
 	return (STRING);
 }

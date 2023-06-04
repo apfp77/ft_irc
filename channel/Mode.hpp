@@ -47,6 +47,8 @@ class Mode  {
 
 		bool is_allow_option(std::string &opt);
 
+		std::string total_mode_string();
+
 		Mode();
 
 		~Mode();

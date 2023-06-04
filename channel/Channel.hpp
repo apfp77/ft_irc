@@ -42,6 +42,9 @@ class Channel : public Mode {
 		std::set<Client *>::size_type get_cli_lst_size() const;
 
 		Client* find_cli_in_ch(Client *cli);
+		Client* find_cli_in_ch_by_str(std::string &str);
+		bool find_cli_in_gm_lst(Client *cli);
+
 		void send_to_ch(std::string &message);
 
 		void insert_cli(Client *cli);
@@ -52,7 +55,8 @@ class Channel : public Mode {
 
 		std::string get_topic() const;
 		void set_topic(Client *cli, std::string &new_message);
-
+		
+		bool find_invite_cli(Client *cli);
 };
 
 #endif
