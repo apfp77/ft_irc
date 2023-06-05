@@ -145,20 +145,16 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 	std::cout << recv_vector[1] << std::endl;
 	Channel *topic_ch = serv.find_ch_with_ch_name(recv_vector[1]);
-	std::cout << "=====" << std::endl;
 	if (topic_ch == NULL)
 	{
-		std::cout << "----" << std::endl;
 		ft_send(ERR_NOSUCHCHANNEL, "IRSSI " + recv_vector[1] + " :No such channel", cli, true);
 		return ;
 	}
 	else if (topic_ch->find_cli_in_ch(cli) == NULL)
 	{
-		std::cout << "---------" << std::endl;
 		ft_send(ERR_NOTONCHANNEL, "IRSSI " + topic_ch->get_ch_name() + " :You're not on that channel", cli, true);
 		return ;
 	}
-	std::cout << "=====" << std::endl;
 	if (recv_vector.size() == 2)
 	{
 		if (topic_ch->get_topic() == "")
@@ -168,7 +164,6 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 	else if (recv_vector.size() > 2)
 	{
-		std::cout << "=====" << std::endl;
 		if (topic_ch->get_mode_topic())
 		{
 			ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
