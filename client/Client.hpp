@@ -27,7 +27,7 @@ class Client {
 	*/
 		struct sockaddr_in &get_cil_addr();
 		socklen_t &get_cli_size();
-		void setting_socket(int srv_sock);
+		void setting_socket();
 		int append_submemory(char *str);
 		std::string division_cmd(int idx);
 		bool pass_flag;
