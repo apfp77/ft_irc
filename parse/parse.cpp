@@ -178,6 +178,10 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	std::cout << "join!" << std::endl;
+	std::cout << recv_vector[0] << std::endl;
+	std::cout << recv_vector[1] << std::endl;
+	std::cout << recv_vector[2] << std::endl;
+	std::cout << "===============" << std::endl;
 	/*
 		Todo
 		채널 생성시 서버에도 넣어주셔야해요
@@ -364,4 +368,5 @@ void parse(std::string recv, Client *cli, Server &serv)
 				break;
 		}
 	}
+	parse_split.clear();
 }
