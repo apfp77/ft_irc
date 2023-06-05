@@ -137,6 +137,7 @@ void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client 
 			idx++;
 			continue;
 		}
+		std::cout << recv_vector[2][idx] << '\n';
 		switch (recv_vector[2][idx])
 		{
 			case 'i':
@@ -205,7 +206,7 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		ft_mode_execute(recv_vector, ch, cli, messages);
 	if (messages[0].length() != 0)
 	{
-		std::string send_mesasge = cli->get_nick_name() + " MODE " + ch->get_ch_name();
+		std::string send_mesasge = ":" + cli->get_nick_name() + " MODE " + ch->get_ch_name();
 		std::cout << messages[1].length() << '\n';
 		if (messages[1].length() != 0)
 			send_mesasge += messages[1];
