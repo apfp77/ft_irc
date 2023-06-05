@@ -96,7 +96,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	{
 		ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli, true);
 	}
-	else if (recv_vector[1][0] == CHANNEL)
+	else if (return_string_type(recv_vector[1]) == CHANNEL)
 	{
 		std::string ch_name = recv_vector[1];
 		Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
@@ -109,10 +109,10 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 			return ;
 		}
 		
-		std::string s;
+		std::string s = ":" + cli->get_nick_name() + " PRIVMSG " + ch_name + " ";
 		for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
 			s += recv_vector[i];
-		privmsg_ch->send_to_ch(s);
+		privmsg_ch->send_to_ch(s, cli);
 	}
 	else if (recv_vector[1][0] == USER)
 	{
@@ -131,7 +131,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	}
 	else
 	{
-		std::cout << recv_vector[1] << '\n';
+		// std::cout << recv_vector[1] << '\n';
 		ft_send(ERR_NORECIPIENT, ":No recipient given", cli, true);
 	}
 }
@@ -167,26 +167,43 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		Mode는 아직 구현안했어요
 	*/
 	
-	if (recv_vector.size() < 1 || !(serv.find_ch_with_ch_name(recv_vector[1])))
+	if (recv_vector.size() < 1)
 	{
 		ft_send(ERR_NOSUCHCHANNEL, ":No such channel" + recv_vector[1] , cli, true);
 		return ;
 	}
-	else if (recv_vector.size() < 2 || !(serv.find_ch_with_ch_name(recv_vector[1])))
+	else if (recv_vector.size() < 2)
 	{
-		ft_send(ERR_NEEDMOREPARAMS, "<command> :Not enough parameters", cli, true);
+		ft_send(ERR_NEEDMOREPARAMS, recv_vector[1] + " :Not enough parameters", cli, true);
 		return ;
 	}
 	Channel *join_ch = serv.find_ch_with_ch_name(recv_vector[1]);
-	if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
+	if (join_ch == NULL)
 	{
-		ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
-		return ;
+		join_ch = new Channel(recv_vector[1], cli);
+		join_ch->insert_cli(cli);
+		join_ch->insert_cli_gm(cli);
+		join_ch->set_passwd(recv_vector[2]);
+		serv.insert_ch(join_ch);
 	}
-	else if (join_ch->get_mode_invite())
+	else
 	{
-		ft_send(ERR_INVITEONLYCHAN, join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
-		return ;
+		if (join_ch->get_passwd() != recv_vector[2])
+		{
+			ft_send(ERR_BADCHANNELKEY, join_ch->get_ch_name() + " :Cannot join channel (+k)", cli, true);
+			return ;
+		}
+		else if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
+		{
+			ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
+			return ;
+		}
+		else if (join_ch->get_mode_invite())
+		{
+			ft_send(ERR_INVITEONLYCHAN, join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
+			return ;
+		}
+		join_ch->insert_cli(cli);
 	}
 	(void)recv_vector;
 	(void)cli;
@@ -220,8 +237,8 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		//RPL_CREATIONTIME (329): 채널생성 시간은 선택
 		return ;
 	}
-	
 	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
+	
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -236,6 +253,14 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	(void)recv_vector;
+	(void)cli;
+	(void)serv;
+}
+
+void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+{
+	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -299,6 +324,9 @@ void parse(std::string recv, Client *cli, Server &serv)
 				break;
 			case INVITE:
 				ft_quit(recv_vector, cli, serv);
+				break;
+			case CAP:
+				ft_cap(recv_vector, cli, serv);
 				break;
 			default:
 				ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
