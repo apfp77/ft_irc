@@ -25,6 +25,20 @@ int	Mode::get_cli_limit() const { return (this->cli_limit); }
 std::string Mode::get_passwd() const { return (this->passwd); }
 
 
+std::string Mode::total_mode_string()
+{
+	std::string ret = "";
+	if (this->mode_invite)
+		ret += 'i';
+	if (this->mode_topic)
+		ret += 't';
+	if (this->mode_key)
+		ret += 'k';
+	if (this->mode_limit)
+		ret += 'l';
+	return (ret);
+}
+
 void Mode::insert_invite_cli(Client *cli)
 {
 	this->invite_cli_set.insert(cli);
@@ -35,6 +49,18 @@ void Mode::delete_invite_cli(Client *cli)
 	std::set<Client *>::iterator it = this->invite_cli_set.find(cli);
 	if (it != this->invite_cli_set.end())
 		this->invite_cli_set.erase(it);
+}
+
+void Mode::invite_cli_all_clean()
+{
+	std::set<Client *>::iterator it = this->invite_cli_set.begin();
+	std::set<Client *>::iterator tmp;
+	while (it != this->invite_cli_set.end())
+	{
+		tmp = it;
+		++it;
+		invite_cli_set.erase(tmp);
+	}	
 }
 
 Mode::~Mode()

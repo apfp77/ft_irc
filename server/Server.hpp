@@ -18,6 +18,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+//isdigit
+#include <cctype>
+
 #define MAXCLIENT 20
 
 class Server {

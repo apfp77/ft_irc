@@ -26,6 +26,6 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	{
 		ft_send(ERR_CHANOPRIVSNEEDED, "You're not channel operator", cli, true);
 	}
-	if 
+	// if 
 
 }

@@ -13,43 +13,51 @@
 void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	std::vector<std::string>::size_type recv_size = recv_vector.size();
-	if (recv_size < 2)
+	if (recv_size < 3)
 	{
-		ft_send(ERR_NORECIPIENT, ":No recipient given", cli, true);
+		if (recv_size < 2)
+			ft_send(ERR_NORECIPIENT, ":No recipient given", cli, true);
+		else
+			ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli, true);
+		return ;
 	}
-	else if (recv_size < 3)
+
+	/*
+		타겟별로 스플릿해서 전송
+	*/
+	std::vector<std::string> target_split = ft_split(recv_vector[1], ",");
+	for (std::vector<std::string>::size_type j = 0; j < target_split.size(); j++)
 	{
-		ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli, true);
-	}
-	else if (return_string_type(recv_vector[1]) == CHANNEL)
-	{
-		std::string ch_name = recv_vector[1];
-		Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
-		
-		if (privmsg_ch == NULL 
-			|| privmsg_ch->find_cli_in_ch(cli) == NULL)
+		if (return_string_type(target_split[j]) == CHANNEL)
 		{
-			ft_send(ERR_CANNOTSENDTOCHAN, ":Cannot send to channel", cli, true);
-			return ;
+			std::string ch_name = target_split[j];
+			Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
+			
+			if (privmsg_ch == NULL 
+				|| privmsg_ch->find_cli_in_ch(cli) == NULL)
+			{
+				ft_send(ERR_CANNOTSENDTOCHAN, ":Cannot send to channel", cli, true);
+				return ;
+			}
+			
+			std::string message = ":" + cli->get_nick_name() + " PRIVMSG " + ch_name + " ";
+			for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
+				message += recv_vector[i];
+			privmsg_ch->send_to_ch(message, cli);
 		}
-		
-		std::string message = ":" + cli->get_nick_name() + " PRIVMSG " + ch_name + " ";
-		for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
-			message += recv_vector[i];
-		privmsg_ch->send_to_ch(message, cli);
-	}
-	else if (return_string_type(recv_vector[1]) == USER)
-	{
-		std::string nick_name = recv_vector[1];
-		Client *privmsg_cli = serv.find_cli_with_nick_name(nick_name);
-		if (privmsg_cli == NULL)
+		else if (return_string_type(target_split[j]) == USER)
 		{
-			ft_send(ERR_NOSUCHNICK, ":No such nick/channel", cli, true);
-			return ;
+			std::string nick_name = target_split[j];
+			Client *privmsg_cli = serv.find_cli_with_nick_name(nick_name);
+			if (privmsg_cli == NULL)
+			{
+				ft_send(ERR_NOSUCHNICK, ":No such nick/channel", cli, true);
+				return ;
+			}
+			std::string message = ":" + cli->get_nick_name() + " PRIVMSG " + nick_name + " ";
+			for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
+				message += recv_vector[i];
+			ft_send("", message, privmsg_cli, false);
 		}
-		std::string message = ":" + cli->get_nick_name() + " PRIVMSG " + nick_name + " ";;
-		for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
-			message += recv_vector[i];
-		ft_send("", message, privmsg_cli, false);
 	}
 }
