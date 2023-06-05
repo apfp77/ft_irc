@@ -138,6 +138,41 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 
 void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	if (recv_vector.size() < 2)
+	{
+		ft_send(ERR_NEEDMOREPARAMS, recv_vector[1] + " :Not enough parameters", cli, true);
+		return ;
+	}
+	Channel *topic_ch = serv.find_ch_with_ch_name(recv_vector[1]);
+	if (topic_ch == NULL)
+	{
+		ft_send(ERR_NOSUCHCHANNEL, "IRSSI " + recv_vector[1] + " :No such channel", cli, true);
+		return ;
+	}
+	else if (topic_ch->find_cli_in_ch(cli) == NULL)
+	{
+		ft_send(ERR_NOTONCHANNEL, "IRSSI " + topic_ch->get_ch_name() + " :You're not on that channel", cli, true);
+		return ;
+	}
+	if (recv_vector.size() == 2)
+	{
+		if (topic_ch->get_topic() == "")
+			ft_send(RPL_NOTOPIC, "IRSSI " + topic_ch->get_ch_name() + " :No topic is set", cli, false);
+		else
+			ft_send(RPL_TOPIC, "IRSSI " + topic_ch->get_ch_name() + topic_ch->get_topic(), cli, false);
+	}
+	else if (recv_vector.size() > 2)
+	{
+		if (topic_ch->get_mode_topic())
+		{
+			ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
+			return ;
+		}
+		topic_ch->set_topic(cli, recv_vector[2]);
+		ft_send(RPL_TOPIC, "IRSSI " + topic_ch->get_ch_name() + " :" + topic_ch->get_topic(), cli, false);
+		std::string s = ":" + cli->get_nick_name() + " PRIVMSG " + topic_ch->get_ch_name() + " IRSSI " + topic_ch->get_ch_name() + " :" + topic_ch->get_topic();
+		topic_ch->send_to_ch(s, cli);
+	}
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -190,21 +225,25 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	{
 		if (join_ch->get_passwd() != recv_vector[2])
 		{
-			ft_send(ERR_BADCHANNELKEY, join_ch->get_ch_name() + " :Cannot join channel (+k)", cli, true);
+			ft_send(ERR_BADCHANNELKEY, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+k)", cli, true);
 			return ;
 		}
 		else if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
 		{
-			ft_send(ERR_CHANNELISFULL, join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
+			ft_send(ERR_CHANNELISFULL, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
 			return ;
 		}
 		else if (join_ch->get_mode_invite())
 		{
-			ft_send(ERR_INVITEONLYCHAN, join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
+			ft_send(ERR_INVITEONLYCHAN, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
 			return ;
 		}
+		// if (join_ch->find_cli_in_ch(cli) != NULL)
+		// 	return ;
 		join_ch->insert_cli(cli);
 	}
+	if (join_ch->get_topic() != "")
+		ft_send(RPL_TOPIC, "IRSSI " + join_ch->get_ch_name() + " :" + join_ch->get_topic(), cli, false);
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -219,6 +258,7 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		1. 채널이 아니거나 
 		2. 채널이 없거나 
 		3. 클라이언트에 권한이 없으면 에러
+	(void)recv_vector;
 	*/
 	std::vector<std::string>::size_type recv_size = recv_vector.size();
 	if (recv_size < 2 || return_string_type(recv_vector[1]) != CHANNEL || recv_vector[1][0] == '\0')
@@ -239,7 +279,6 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	
-	(void)recv_vector;
 	(void)cli;
 	(void)serv;
 }
