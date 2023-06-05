@@ -7,6 +7,8 @@
 #include <vector>
 //isalnum
 #include <ctype.h>
+#include "Numerics.hpp"
+#include "ft_utils.hpp"
 
 #define PING 1
 #define PASS 2

@@ -17,7 +17,7 @@ CHANNEL_SRCS:= Channel.cpp Mode.cpp
 CHANNEL_OBJS := $(addprefix $(CHANNEL_DIR)/,$(CHANNEL_SRCS:.cpp=.o))
 
 PARSE_DIR:= parse
-PARSE_SRCS:= parse.cpp
+PARSE_SRCS:= parse.cpp ft_privmsg.cpp
 PARSE_OBJS := $(addprefix $(PARSE_DIR)/,$(PARSE_SRCS:.cpp=.o))
 
 UTILS_DIR:= utils

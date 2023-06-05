@@ -53,9 +53,7 @@ std::vector<std::string> ft_split(std::string &str, std::string delimiter)
 
 int return_string_type(std::string &s)
 {
-	if (s[0] == '@')
-		return (USER);
-	else if (s[0] == '#' || s[0] == '&')
+	if (s[0] == '#')
 		return (CHANNEL);
-	return (STRING);
+	return (USER);
 }
