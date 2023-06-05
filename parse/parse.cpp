@@ -145,40 +145,6 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
-void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	/*
-		요구사항에서 MODE는 채널 모드 변경만을 요구하므로 사용자는 해석할 수 없습니다
-	*/
-	/*
-		1. 채널이 아니거나 
-		2. 채널이 없거나 
-		3. 클라이언트에 권한이 없으면 에러
-	*/
-	std::vector<std::string>::size_type recv_size = recv_vector.size();
-	if (recv_size < 2 || return_string_type(recv_vector[1]) != CHANNEL || recv_vector[1][0] == '\0')
-	{
-		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
-		return ;
-	}
-	std::string ch_name = recv_vector[1];
-	// Channel *ch = serv.find_ch_with_ch_name(ch_name);
-	/*
-		크기가 3이하거나 허용하지 않는 문자가 있을경우(+, -, 
-	*/
-	if (recv_size < 3)
-	{
-		ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
-		//RPL_CREATIONTIME (329): 채널생성 시간은 선택
-		return ;
-	}
-	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
-	
-	(void)recv_vector;
-	(void)cli;
-	(void)serv;
-}
-
 void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	(void)recv_vector;
