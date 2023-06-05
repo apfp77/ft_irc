@@ -36,12 +36,12 @@ std::string Client::division_cmd(int idx)
 	return (cmd_memory);
 }
 
-void Client::setting_socket(int cli_sock)
+void Client::setting_socket()
 {
 	int value = 1;
-	if (setsockopt(cli_sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&value, sizeof(value)) == -1)
+	if (setsockopt(this->cli_sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&value, sizeof(value)) == -1)
 		throw ("setsoctopt() error");
-	if (fcntl(cli_sock, F_SETFL, O_NONBLOCK) == -1)
+	if (fcntl(this->cli_sock, F_SETFL, O_NONBLOCK) == -1)
 		throw ("fcntl() error");
 }
 
