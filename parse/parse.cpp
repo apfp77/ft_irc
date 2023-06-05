@@ -219,7 +219,6 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		join_ch->insert_cli(cli);
 		join_ch->insert_cli_gm(cli);
 		join_ch->set_passwd(recv_vector[2]);
-		serv.insert_ch(join_ch);
 	}
 	else
 	{
