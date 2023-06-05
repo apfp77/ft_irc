@@ -145,15 +145,10 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
-void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	(void)recv_vector;
-	(void)cli;
-	(void)serv;
-}
-
 void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	if (recv_vector.size() == 1)
+
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;

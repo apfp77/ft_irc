@@ -23,7 +23,6 @@ void ft_mode_execute_topic(Channel *ch, char &flag)
 
 int ft_mode_execute_key(Channel *ch, char &flag, Client *cli, std::string &key, std::string (&messages)[2])
 {
-	// std::string message;
 	if (flag == '+')
 	{
 		for (int j = 0; key[j]; j++)
@@ -35,18 +34,14 @@ int ft_mode_execute_key(Channel *ch, char &flag, Client *cli, std::string &key, 
 			}
 		}
 		messages[0] += 'k';
-		// message = "MODE " + ch->get_ch_name() + "+k " + key;
 		ch->set_mode_key(true);
-		// ch->send_to_ch(message, cli);
 		ch->set_passwd(key);
 		messages[1] += (" " + key);
 		return (1);
 	}
 	else if (flag == '-')
 	{
-		// message = "MODE " + ch->get_ch_name() + "-k " + ch->get_passwd();
 		ch->set_mode_key(false);
-		// ch->send_to_ch(message, cli);
 		std::string passwd="";
 		ch->set_passwd(passwd);
 		messages[0] += 'k';
@@ -62,8 +57,6 @@ int ft_mode_execute_key(Channel *ch, char &flag, Client *cli, std::string &key, 
 void ft_mode_execute_operator(Channel *ch, char &flag, Client *cli, std::string &nick_name, std::string (&messages)[2])
 {
 	Client *user = ch->find_cli_in_ch_by_str(nick_name);
-	std::cout << "TEST" << '\n';
-	// std::string message;
 	if (user == NULL)
 	{
 		ft_send(ERR_USERNOTINCHANNEL,  cli->get_nick_name() + " " + nick_name + " " + ch->get_ch_name() + " :They aren't on that channel", cli, true);
@@ -72,16 +65,13 @@ void ft_mode_execute_operator(Channel *ch, char &flag, Client *cli, std::string 
 	if (flag == '+')
 	{
 		ch->insert_cli_gm(user);
-		// message = "MODE " + ch->get_ch_name() + " +o " + user->get_nick_name();
 	}
 	else if (flag == '-')
 	{
 		ch->delete_cli_gm(user);
-		// message = "MODE " + ch->get_ch_name() + " -o " + user->get_nick_name();
 	}
 	messages[0] += 'o';
 	messages[1] += (" " + nick_name);
-	// ch->send_to_ch(message, cli);
 }
 
 int ft_mode_execute_limit(Channel *ch, char &flag, std::string &num, std::string (&messages)[2])
@@ -117,7 +107,7 @@ int ft_mode_execute_limit(Channel *ch, char &flag, std::string &num, std::string
 */
 void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client *cli, std::string (&messages)[2])
 {
-	std::vector<std::string>::size_type mode_argv_idx = 2;
+	std::vector<std::string>::size_type mode_argv_idx = 3;
 	
 	char flag = '\0';
 	int idx = 0;
@@ -137,7 +127,6 @@ void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client 
 			idx++;
 			continue;
 		}
-		std::cout << recv_vector[2][idx] << '\n';
 		switch (recv_vector[2][idx])
 		{
 			case 'i':
@@ -207,7 +196,6 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	if (messages[0].length() != 0)
 	{
 		std::string send_mesasge = ":" + cli->get_nick_name() + " MODE " + ch->get_ch_name();
-		std::cout << messages[1].length() << '\n';
 		if (messages[1].length() != 0)
 			send_mesasge += messages[1];
 		ch->all_send_to_ch(send_mesasge);
