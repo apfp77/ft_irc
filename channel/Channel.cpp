@@ -50,3 +50,10 @@ void Channel::send_to_ch(std::string &message, Client *cli)
 			ft_send("", message, (*it), false);
 	}
 }
+
+std::string Channel::get_topic() const { return (this->topic_message); }
+void Channel::set_topic(Client *cli, std::string &new_message)
+{
+	(void)cli;
+	this->topic_message = new_message;
+}
