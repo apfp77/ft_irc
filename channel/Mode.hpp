@@ -46,6 +46,7 @@ class Mode  {
 		void delete_invite_cli(Client *cli);
 
 		bool is_allow_option(std::string &opt);
+		void invite_cli_all_clean();
 
 		std::string total_mode_string();
 

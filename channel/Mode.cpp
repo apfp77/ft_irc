@@ -51,6 +51,18 @@ void Mode::delete_invite_cli(Client *cli)
 		this->invite_cli_set.erase(it);
 }
 
+void Mode::invite_cli_all_clean()
+{
+	std::set<Client *>::iterator it = this->invite_cli_set.begin();
+	std::set<Client *>::iterator tmp;
+	while (it != this->invite_cli_set.end())
+	{
+		tmp = it;
+		++it;
+		invite_cli_set.erase(tmp);
+	}	
+}
+
 Mode::~Mode()
 {
 

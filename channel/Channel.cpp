@@ -71,3 +71,12 @@ void Channel::send_to_ch(std::string &message, Client *cli)
 			ft_send("", message, (*it), false);
 	}
 }
+
+void Channel::all_send_to_ch(std::string &message)
+{
+	std::set<Client *>::iterator it = this->cli_lst.begin();
+	for (; it != this->cli_lst.end(); ++it)
+	{
+		ft_send("", message, (*it), false);
+	}
+}

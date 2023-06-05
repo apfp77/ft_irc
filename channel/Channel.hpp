@@ -46,6 +46,7 @@ class Channel : public Mode {
 		bool find_cli_in_gm_lst(Client *cli);
 
 		void send_to_ch(std::string &message, Client *cli);
+		void all_send_to_ch(std::string &message);
 
 		void insert_cli(Client *cli);
 		void insert_cli_gm(Client *cli);

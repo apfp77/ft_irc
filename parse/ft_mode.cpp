@@ -1,10 +1,121 @@
 #include "parse.hpp"
+#include <sstream>
+
+void ft_mode_execute_invite(Channel *ch, char &flag)
+{
+	if (flag == '+')
+	{
+		ch->set_mode_invite(true);
+	}
+	else if (flag == '-')
+	{		
+		ch->set_mode_invite(false);
+		ch->invite_cli_all_clean();
+	}
+}
+void ft_mode_execute_topic(Channel *ch, char &flag)
+{
+	if (flag == '+')
+		ch->set_mode_topic(true);
+	else if (flag == '-')
+		ch->set_mode_topic(false);
+}
+
+int ft_mode_execute_key(Channel *ch, char &flag, Client *cli, std::string &key, std::string (&messages)[2])
+{
+	// std::string message;
+	if (flag == '+')
+	{
+		for (int j = 0; key[j]; j++)
+		{
+			if (!isprint(key[j]))
+			{
+				ft_send(ERR_INVALIDKEY, ch->get_ch_name() + " :Key is not well-formed", cli, false);
+				return (1);
+			}
+		}
+		messages[0] += 'k';
+		// message = "MODE " + ch->get_ch_name() + "+k " + key;
+		ch->set_mode_key(true);
+		// ch->send_to_ch(message, cli);
+		ch->set_passwd(key);
+		messages[1] += (" " + key);
+		return (1);
+	}
+	else if (flag == '-')
+	{
+		// message = "MODE " + ch->get_ch_name() + "-k " + ch->get_passwd();
+		ch->set_mode_key(false);
+		// ch->send_to_ch(message, cli);
+		std::string passwd="";
+		ch->set_passwd(passwd);
+		messages[0] += 'k';
+	}
+	return (0);
+}
+
+/*
+	1. 채널에 사용자가 없으면 에러
+	2. 채널에 사용자가 있다면 명령어를 실행한 결과를 채널에 알린다
+		ex) MODE <channel> +o <권한 받은 유저>
+*/
+void ft_mode_execute_operator(Channel *ch, char &flag, Client *cli, std::string &nick_name, std::string (&messages)[2])
+{
+	Client *user = ch->find_cli_in_ch_by_str(nick_name);
+	std::cout << "TEST" << '\n';
+	// std::string message;
+	if (user == NULL)
+	{
+		ft_send(ERR_USERNOTINCHANNEL,  cli->get_nick_name() + " " + nick_name + " " + ch->get_ch_name() + " :They aren't on that channel", cli, true);
+		return ;
+	}
+	if (flag == '+')
+	{
+		ch->insert_cli_gm(user);
+		// message = "MODE " + ch->get_ch_name() + " +o " + user->get_nick_name();
+	}
+	else if (flag == '-')
+	{
+		ch->delete_cli_gm(user);
+		// message = "MODE " + ch->get_ch_name() + " -o " + user->get_nick_name();
+	}
+	messages[0] += 'o';
+	messages[1] += (" " + nick_name);
+	// ch->send_to_ch(message, cli);
+}
+
+int ft_mode_execute_limit(Channel *ch, char &flag, std::string &num, std::string (&messages)[2])
+{
+	if (flag == '+')
+	{
+		if (!string_isalnum(num))
+		{
+			// ERR_NEEDMOREPARAMS (461) or 무시
+			return (1);
+		}
+		std::stringstream ss(num);
+		int x;
+		ss >> x;
+		ch->set_cli_limit(x);
+		ch->set_mode_limit(true);
+		messages[0] += 'l';
+		messages[1] += (" " + num);
+		return (1);
+	}
+	else if (flag == '-')
+	{
+		messages[0] += 'l';
+		ch->set_mode_key(false);
+		ch->set_cli_limit(0);
+	}
+	return (0);
+}
 
 /*
 	Todo
 	* 옵션별로 메세지를 쪼개서 보내는것이 아니라 에러옵션이나 상황을 뺀 나머지를 합쳐서 보냄 - 수정예정
 */
-void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client *cli, std::vector<std::string>::size_type recv_size)
+void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client *cli, std::string (&messages)[2])
 {
 	std::vector<std::string>::size_type mode_argv_idx = 2;
 	
@@ -15,115 +126,52 @@ void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client 
 	{
 		if (flag == '\0')
 		{
-			if (recv_vector[2][idx] == '+')
-				flag = '+';
-			else if (recv_vector[2][idx] == '-')
-				flag = '-';
-			else
-				// ft_send
+			flag = recv_vector[2][idx];
+			messages[0] += flag;
+			if (flag != '+' && flag != '-')
+			{
+				ft_send(ERR_UNKNOWNMODE, cli->get_nick_name() + " " + recv_vector[2][idx] + " :is unknown mode char to me", cli, false);
+				flag = '\0';
+				messages[0].erase(messages[0].end() - 1); 
+			}
 			idx++;
 			continue;
 		}
 		switch (recv_vector[2][idx])
 		{
 			case 'i':
-				if (flag == '+')
-					ch->set_mode_invite(true);
-				else if (flag == '-')
-					ch->set_mode_invite(false);
+				ft_mode_execute_invite(ch, flag);
+				messages[0] += 'i';
 				break;
 			case 't':
-				if (flag == '+')
-					ch->set_mode_topic(true);
-				else if (flag == '-')
-					ch->set_mode_topic(false);
+				ft_mode_execute_topic(ch, flag);
+				messages[0] += 't';
 				break;
 			case 'k':
-				if (mode_argv_idx < recv_size)
-				{
-					std::string message;
-					if (flag == '+')
-					{
-						for (int j = 0; recv_vector[mode_argv_idx][j]; j++)
-						{
-							if (!isprint(recv_vector[mode_argv_idx][j]))
-							{
-								ft_send(ERR_INVALIDKEY, ch->get_ch_name() + " :Key is not well-formed", cli, false);
-								break;
-							}
-						}
-						message = "MODE " + ch->get_ch_name() + "+k " + recv_vector[mode_argv_idx];
-						ch->set_mode_key(true);
-						ch->send_to_ch(message, cli);
-						ch->set_passwd(recv_vector[mode_argv_idx]);
-						mode_argv_idx++;
-					}
-					else if (flag == '-')
-					{
-						message = "MODE " + ch->get_ch_name() + "-k " + ch->get_passwd();
-						ch->set_mode_key(false);
-						ch->send_to_ch(message, cli);
-						std::string passwd="";
-						ch->set_passwd(passwd);
-					}
-				}
+				if (mode_argv_idx < recv_vector.size())
+					mode_argv_idx += ft_mode_execute_key(ch, flag, cli, recv_vector[mode_argv_idx], messages);
 				break;
 			case 'o':
-				if (mode_argv_idx < recv_size)
+				if (mode_argv_idx < recv_vector.size())
 				{
-					/*
-						1. 채널에 사용자가 없으면 에러
-						2. 채널에 사용자가 있다면 명령어를 실행한 결과를 채널에 알린다
-							ex) MODE <channel> +o <권한 받은 유저>
-					*/
-					Client *user = ch->find_cli_in_ch_by_str(recv_vector[mode_argv_idx]);
-					std::string message;
-					if (user == NULL)
-					{
-						ft_send(ERR_USERNOTINCHANNEL,  cli->get_nick_name() + " " + recv_vector[mode_argv_idx] + " " + ch->get_ch_name() + " :They aren't on that channel", cli, true);
-						break ;
-					}
-					if (flag == '+')
-					{
-						ch->insert_cli_gm(user);
-						message = "MODE " + ch->get_ch_name() + " +o " + user->get_nick_name();
-					}
-					else if (flag == '-')
-					{
-						ch->delete_cli_gm(user);
-						message = "MODE " + ch->get_ch_name() + " -o " + user->get_nick_name();
-					}
-					else
-						break;
-					ch->send_to_ch(message, cli);
+					ft_mode_execute_operator(ch, flag, cli, recv_vector[mode_argv_idx], messages);
 					mode_argv_idx++;
 				}
 				break;
 			case 'l':
-				if (mode_argv_idx < recv_size)
+				if (mode_argv_idx < recv_vector.size())
 				{
-					std::string message;
-					if (flag == '+')
-					{
-						if (!string_isalnum(recv_vector[mode_argv_idx]))
-							break;
-					}
-					else if (flag == '-')
-					{
-						ch->set_mode_key(false);
-					}
-					else
-						break;
+					mode_argv_idx += ft_mode_execute_limit(ch, flag, recv_vector[mode_argv_idx], messages);
 				}
 				break;
 			default:
-				//ft_send
+				ft_send(ERR_UNKNOWNMODE, cli->get_nick_name() + " " + recv_vector[2][idx] + " :is unknown mode char to me", cli, false);
 				break;
 		}
 		idx++;
 	}
 }
-/*    
+/*
 	Command: MODE
   Parameters: <target> [<modestring> [<mode arguments>...]]
 
@@ -134,20 +182,33 @@ void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client 
 */
 void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-	std::vector<std::string>::size_type recv_size = recv_vector.size();
-	//채널이 설정되지 않은 경우
-	if (recv_size < 2 || return_string_type(recv_vector[1]) != CHANNEL)
+	std::string messages[2];
+	/*
+		0: 성공한 옵션 
+		1: 성공한 값 
+		ex) +kl test 15
+	*/
+	if (recv_vector.size() < 2 || return_string_type(recv_vector[1]) != CHANNEL)
 	{
 		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
 		return ;
 	}
 	std::string ch_name = recv_vector[1];
 	Channel *ch = serv.find_ch_with_ch_name(ch_name);
+	// std::vector<
 	// 조회용, ex) /mode #channel
-	if (recv_size < 3)
+	if (recv_vector.size() < 3)
 		ft_send(RPL_CHANNELMODEIS, cli->get_nick_name() + " " + ch_name + " " + ch->total_mode_string() , cli, false);
 	else if (ch->find_cli_in_gm_lst(cli) == false)
-		ft_send(RPL_CHANNELMODEIS, cli->get_nick_name() + " " + ch_name + " :You're not channel operator" , cli, false);
+		ft_send(ERR_CHANOPRIVSNEEDED, cli->get_nick_name() + " " + ch_name + " :You're not channel operator" , cli, false);
 	else
-		ft_mode_execute(recv_vector, ch, cli, recv_size);
+		ft_mode_execute(recv_vector, ch, cli, messages);
+	if (messages[0].length() != 0)
+	{
+		std::string send_mesasge = cli->get_nick_name() + " MODE " + ch->get_ch_name();
+		std::cout << messages[1].length() << '\n';
+		if (messages[1].length() != 0)
+			send_mesasge += messages[1];
+		ch->all_send_to_ch(send_mesasge);
+	}
 }
