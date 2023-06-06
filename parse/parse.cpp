@@ -160,7 +160,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		}
 		else
 		{
-			if (join_ch->get_passwd() != pw_split[i])
+			if (join_ch->get_passwd().size() > 1 && join_ch->get_passwd() != pw_split[i])
 				ft_send(ERR_BADCHANNELKEY, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+k)", cli, true);
 			else if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
 				ft_send(ERR_CHANNELISFULL, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
