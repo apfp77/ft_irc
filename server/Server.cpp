@@ -271,6 +271,11 @@ Channel* Server::find_ch_with_ch_name(std::string &channel_name)
     return (NULL);
 }
 
+void Server::password_err_message(Client *cli)
+{
+	ft_send(ERR_PASSWDMISMATCH, "your_client :Password incorrect", cli, true);
+}
+
 bool Server::check_pass_flag_cli_exit(Client *cli)
 {
 	if (cli->pass_flag == false)
@@ -283,7 +288,6 @@ bool Server::check_pass_flag_cli_exit(Client *cli)
 		{
 			if (fds[i].fd == cli->get_socket())
 			{
-				ft_send(ERR_PASSWDMISMATCH, " :Password incorrect", cli, false);
 				delete_cli(cli);
 				delete cli;
 				close(fds[i].fd);
