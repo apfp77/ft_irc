@@ -71,7 +71,7 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 	else if (recv_vector.size() > 2)
 	{
-		if (topic_ch->get_mode_topic())
+		if (topic_ch->get_mode_topic() && !topic_ch->find_cli_in_gm_lst(cli))
 		{
 			ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
 			return ;
