@@ -271,4 +271,29 @@ Channel* Server::find_ch_with_ch_name(std::string &channel_name)
 	return (NULL);
 }
 
+bool Server::check_pass_flag_cli_exit(Client *cli)
+{
+	if (cli->pass_flag == false)
+	{
+		/*
+			Todo
+			* 최적화할 예정
+		*/
+		for (int i = 1; MAXCLIENT + 1; ++i)
+		{
+			if (fds[i].fd == cli->get_socket())
+			{
+				delete_cli(cli);
+				delete cli;
+				close(fds[i].fd);
+				fds[i].fd = -1;
+				fds[i].events = 0;
+				return (true);
+			}
+		}
+	}
+	return (false);
+}
+
+
 Server::~Server(){}

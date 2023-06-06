@@ -8,6 +8,11 @@ Client::Client()
 	user_name = "";
 }
 
+void Client::set_fds_index(int fds_index){ this->fds_index = fds_index; }
+
+int Client::get_fds_index() const{ return (this->fds_index); }
+
+
 struct sockaddr_in &Client::get_cil_addr()
 {
 	return (this->cli_sockaddr);

@@ -20,6 +20,7 @@ class Client {
 		struct sockaddr_in cli_sockaddr;
 		socklen_t cli_sockaddr_l;
 		std::string sub_memory;
+		int fds_index;
 
 	public:
 	/*
@@ -35,6 +36,8 @@ class Client {
 		void set_socket(int cli_sock);
 		void set_nick_name(std::string &nick_name);
 		std::string get_nick_name() const;
+		void set_fds_index(int fds_index);
+		int get_fds_index() const;
 		Client();
 		~Client();
 };

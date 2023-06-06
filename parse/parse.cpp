@@ -176,7 +176,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 		인증 전에 PING과 QUIT, 등록되지 않은 명령어를 제외한 명령어가 들어오면
 			클라이언트와의 연결을 끊는다
 	*/
-	
 	std::vector <std::vector<std::string> > parse_split;
 	std::vector <std::string> recv_vector;
 	recv_vector = ft_split(recv, "\r\n");
@@ -195,31 +194,47 @@ void parse(std::string recv, Client *cli, Server &serv)
 				ft_pass(recv_vector, cli, serv);
 				break;
 			case NICK:
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
 				ft_nick(recv_vector, cli, serv);
 				break;
 			case NAMES:
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
 				ft_names(recv_vector, cli, serv);
 				break;
 			case PRIVMSG:
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
 				ft_privmsg(recv_vector, cli, serv);
 				break;
 			case TOPIC:
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
 				ft_topic(recv_vector, cli, serv);
 				break;
 			case JOIN:
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
 				ft_join(recv_vector, cli, serv);
 				break;
 			case MODE:
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
 				ft_mode(recv_vector, cli, serv);
 				break;
 			case KICK:
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
 				ft_kick(recv_vector, cli, serv);
 				break;
 			case QUIT:
 				ft_quit(recv_vector, cli, serv);
 				break;
 			case INVITE:
-				ft_quit(recv_vector, cli, serv);
+				if (serv.check_pass_flag_cli_exit(cli) == true)
+					return ;
+				ft_invite(recv_vector, cli, serv);
 				break;
 			case CAP:
 				ft_cap(recv_vector, cli, serv);
