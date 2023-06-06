@@ -1,6 +1,4 @@
 #include "parse.hpp"
-#include "Numerics.hpp"
-#include "ft_utils.hpp"
 
 void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
@@ -32,7 +30,6 @@ void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	ft_send("", ret, cli, false);
 	(void)serv;
 }
-
 
 void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
@@ -72,69 +69,7 @@ void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 /*
 	PASS를 통과하지 못하면 서버와의 연결을 끊어버린다
 */
-void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	/*
-		ERR_NOSUCHNICK (401) : 닉네임이 x
-		ERR_CANNOTSENDTOCHAN (404) : 사용자의 메세지를 채널에 전달하지 못할경우 사용됨
-		ERR_TOOMANYTARGETS (407) : 아규먼트가 많은 경우 발생 (irc protocol에 privmsg에 써있지만 정의되어 있지않음)
-		ERR_NORECIPIENT (411) : 수신자가 없는경우 (채널, 클라이언트가 안써있는 경우)
-		ERR_NOTEXTTOSEND (412) : 보낼 텍스트가 없는 경우
-		ERR_NOTOPLEVEL (413) : 서버차원에서 최상위
-		ERR_WILDTOPLEVEL (414) : 와일드카드 관련 에러
-		RPL_AWAY (301) : 사용자가 자리비움인경우
-	*/
-	/*
-		irssi) PRIVMSG #channel :test
-		limechat) PRIVMSG #channel test
-		limechat은 문자열을 평문으로 보내고irssi는 :를 붙인다
-		첫번째만 확인하고 나머진 문자열로 취급하나 2번째 인덱스의 첫 문자가 :인경우를 제외시킨다
-	*/
 
-	std::vector<std::string>::size_type recv_size = recv_vector.size();
-	if (recv_size < 3)
-	{
-		ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli, true);
-	}
-	else if (return_string_type(recv_vector[1]) == CHANNEL)
-	{
-		std::string ch_name = recv_vector[1];
-		Channel *privmsg_ch = serv.find_ch_with_ch_name(ch_name);
-		
-		//채널 이름이 없거나, 채널에 소속되지 않은 경우
-		if (privmsg_ch == NULL 
-			|| privmsg_ch->find_cli_in_ch(cli) == NULL)
-		{
-			ft_send(ERR_CANNOTSENDTOCHAN, ":Cannot send to channel", cli, true);
-			return ;
-		}
-		
-		std::string s = ":" + cli->get_nick_name() + " PRIVMSG " + ch_name + " ";
-		for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
-			s += recv_vector[i];
-		privmsg_ch->send_to_ch(s, cli);
-	}
-	else if (recv_vector[1][0] == USER)
-	{
-		std::string nick_name = recv_vector[1].substr(1);
-		Client *privmsg_cli = serv.find_cli_with_nick_name(nick_name);
-		if (privmsg_cli == NULL)
-		{
-			ft_send(ERR_NOSUCHNICK, ":No such nick/channel", cli, true);
-			return ;
-		}
-		//	문자열 합쳐서 해당 클라이언트에 보내기
-		std::string s;
-		for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
-			s += recv_vector[i];
-		ft_send("", s, privmsg_cli, false);
-	}
-	else
-	{
-		// std::cout << recv_vector[1] << '\n';
-		ft_send(ERR_NORECIPIENT, ":No recipient given", cli, true);
-	}
-}
 
 void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
@@ -241,49 +176,10 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 }
 
-void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	/*
-		요구사항에서 MODE는 채널 모드 변경만을 요구하므로 사용자는 해석할 수 없습니다
-	*/
-	/*
-		1. 채널이 아니거나 
-		2. 채널이 없거나 
-		3. 클라이언트에 권한이 없으면 에러
-	(void)recv_vector;
-	*/
-	std::vector<std::string>::size_type recv_size = recv_vector.size();
-	if (recv_size < 2 || return_string_type(recv_vector[1]) != CHANNEL || recv_vector[1][0] == '\0')
-	{
-		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
-		return ;
-	}
-	std::string ch_name = recv_vector[1];
-	// Channel *ch = serv.find_ch_with_ch_name(ch_name);
-	/*
-		크기가 3이하거나 허용하지 않는 문자가 있을경우(+, -, 
-	*/
-	// if (recv_size < 3 || ch->is_allow_option(recv_vector[2]))
-	{
-		ft_send(RPL_CREATIONTIME, cli->get_nick_name() + " #" + ch_name + " +" , cli, false);
-		//RPL_CREATIONTIME (329): 채널생성 시간은 선택
-		return ;
-	}
-	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
-	
-	(void)cli;
-	(void)serv;
-}
-
-void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	(void)recv_vector;
-	(void)cli;
-	(void)serv;
-}
-
 void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
+	if (recv_vector.size() == 1)
+
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;

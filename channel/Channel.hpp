@@ -37,22 +37,29 @@ class Channel : public Mode {
 		std::string get_ch_name() const;
 		
 		void set_passwd(std::string &passwd);
-		std::string get_passwd() const;
+		std::string get_passwd() const ;
 
 		std::set<Client *>::size_type get_cli_lst_size() const;
 
 		Client* find_cli_in_ch(Client *cli);
+		Client* find_cli_in_gm_ch(Client *cli);
+		Client* find_cli_in_ch_by_str(std::string &str);
+		bool find_cli_in_gm_lst(Client *cli);
+
 		void send_to_ch(std::string &message, Client *cli);
+		void all_send_to_ch(std::string &message);
 
 		void insert_cli(Client *cli);
 		void insert_cli_gm(Client *cli);
 
 		void delete_cli(Client *cli);
 		void delete_cli_gm(Client *cli);
+		void delete_gm_cli_and_cli(Client *cli);
 
 		std::string get_topic() const;
 		void set_topic(Client *cli, std::string &new_message);
-
+		
+		bool find_invite_cli(Client *cli);
 };
 
 #endif

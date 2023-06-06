@@ -127,17 +127,17 @@ void Server::execute()
 
 void Server::accept_client()
 {
-	Client *client = new Client;
-	client->set_socket(accept(this->srv_sock, \
-	reinterpret_cast<sockaddr*>(&client->get_cil_addr()), &(client->get_cli_size())));
-	if (client->get_socket() == -1)
+	Client *cli = new Client;
+	cli->set_socket(accept(this->srv_sock, reinterpret_cast<sockaddr*>(&cli->get_cil_addr()), &(cli->get_cli_size())));
+	if (cli->get_socket() == -1)
 	{
-		delete client;
+		delete cli;
 		throw(1);
 	}
-	this->find_vacant_fds().fd = client->get_socket();
-	this->insert_cli(client);
-	// std::cout << "생성된 클라이언트 소켓 " << client->get_socket() << std::endl;
+	cli->setting_socket();
+	this->find_vacant_fds().fd = cli->get_socket();
+	this->insert_cli(cli);
+	// std::cout << "생성된 클라이언트 소켓 " << cli->get_socket() << std::endl;
 }
 
 struct pollfd &Server::find_vacant_fds()
@@ -156,17 +156,32 @@ struct pollfd &Server::find_vacant_fds()
 
 void Server::erase_clinet(pollfd &fds)
 {
-	Client *client;
-	client = this->find_client(fds.fd);
-	/*
-		Todo
-		클라이언트 연쇄제거
-	*/
-	// delete client;
-	delete_cli(client);
+	Client *cli;
+	cli = this->find_client(fds.fd);
+	this->cli_belong_channel_delete(cli);
+	delete_cli(cli);
+	delete cli;
 	close(fds.fd);
 	fds.fd = -1;
 	fds.events = 0;
+}
+
+void Server::cli_belong_channel_delete(Client *cli)
+{
+	std::set<Channel *>::iterator it = this->ch_set.begin();
+	for (; it != ch_set.end(); it++)
+	{
+		int check = 0;
+		if ((*it)->find_cli_in_ch(cli) == NULL)
+			continue ;
+		check = (*it)->get_cli_lst_size();
+		(*it)->delete_gm_cli_and_cli(cli);
+		if (check == 1)
+		{
+			delete_ch(*it);
+			delete (*it);
+		}
+	}
 }
 
 Client *Server::find_client(int fd)

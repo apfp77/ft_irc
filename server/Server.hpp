@@ -18,6 +18,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+//isdigit
+#include <cctype>
+
 #define MAXCLIENT 20
 
 class Server {
@@ -44,7 +47,7 @@ class Server {
 		struct pollfd &find_vacant_fds();
 		Client *find_client(int fd);
 		void message_receive(pollfd &fds);
-		// struct pollfd fds[MAXCLIENT + 1];
+		void cli_belong_channel_delete(Client *cli);
 		void set_socket(int socker_fd);
 		int get_socket() const;
 		void set_channel(std::string &channel_name);
