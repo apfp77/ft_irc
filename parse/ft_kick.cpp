@@ -15,8 +15,10 @@ static std::string merge_send_message(std::string kick_channel_message, std::str
 static std::string merge_kick_channel_message(std::vector<std::string> &recv_vector);
 static std::string merge_explain_message(std::vector<std::string> &recv_vector, std::string cli_nick);
 static std::vector<std::string> check_kick_target_in_channel(Channel *channel, Client *cli, std::string recv_vector);
+
 static void check_parameter(std::vector<std::string> &recv_vector, Client *cli);
 static Channel *check_exist_channel(std::string recv_vector, Server &serv, Client *cli);
+
 static void check_me_belong_channel(Channel *channel, Client *cli);
 static void check_me_operator_in_channel(Channel *channel, Client *cli);
 
@@ -24,8 +26,10 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	try
 	{
+
 		check_parameter(recv_vector, cli);
 		Channel *channel = check_exist_channel(recv_vector[1], serv, cli);
+
 		check_me_belong_channel(channel, cli);
 		check_me_operator_in_channel(channel, cli);
 		std::vector<std::string> users = check_kick_target_in_channel(channel, cli, recv_vector[3]);
@@ -122,10 +126,12 @@ static std::vector<std::string> check_kick_target_in_channel(Channel *channel, C
 				users.erase(users.begin() + i);
 				t_err_box err_box;
 				err_box.err_code = ERR_USERNOTINCHANNEL;
+
 				err_box.err_message.append(cli->get_nick_name());
 				err_box.err_message.append(" ");
 				err_box.err_message.append(channel->get_ch_name());
-				err_box.err_message.append(" They aren't on that channel");
+				err_box.err_message.append(" :They aren't on that channel");
+
 				throw (err_box);
 			}
 			i++;
@@ -138,20 +144,26 @@ static std::vector<std::string> check_kick_target_in_channel(Channel *channel, C
 	return (users);
 }
 
+
 static void check_parameter(std::vector<std::string> &recv_vector, Client *cli)
+
 {
 	if (recv_vector.size() <= 2)
 	{
 		t_err_box err_box;
 		err_box.err_code = ERR_NEEDMOREPARAMS;
+
 		err_box.err_message.append(cli->get_nick_name());
 		err_box.err_message.append(" /KICK");
 		err_box.err_message.append(" :Not enough parameters");
+
 		throw (err_box);
 	}
 }
 
+
 static Channel *check_exist_channel(std::string recv_vector, Server &serv, Client *cli)
+
 {
 	Channel *channel = serv.find_ch_with_ch_name(recv_vector);
 
@@ -159,10 +171,12 @@ static Channel *check_exist_channel(std::string recv_vector, Server &serv, Clien
 	{
 		t_err_box err_box;
 		err_box.err_code = ERR_NOSUCHCHANNEL;
+
 		err_box.err_message.append(cli->get_nick_name());
 		err_box.err_message.append(" ");
 		err_box.err_message.append(recv_vector);
-		err_box.err_message.append(" No such channel");
+		err_box.err_message.append(" :No such channel");
+
 		throw (err_box);
 	}
 	return (channel);
@@ -174,10 +188,12 @@ static void check_me_belong_channel(Channel *channel, Client *cli)
 	{
 		t_err_box err_box;
 		err_box.err_code = ERR_NOTONCHANNEL;
+
 		err_box.err_message.append(cli->get_nick_name());
 		err_box.err_message.append(" ");
 		err_box.err_message.append(channel->get_ch_name());
-		err_box.err_message.append(" You're not on that channel");
+		err_box.err_message.append(" :You're not on that channel");
+
 		throw (err_box);
 	}
 }
@@ -188,10 +204,12 @@ static void check_me_operator_in_channel(Channel *channel, Client *cli)
 	{
 		t_err_box err_box;
 		err_box.err_code = ERR_CHANOPRIVSNEEDED;
+
 		err_box.err_message.append(cli->get_nick_name());
 		err_box.err_message.append(" ");
 		err_box.err_message.append(channel->get_ch_name());
-		err_box.err_message.append(" You're not channel operator");
+		err_box.err_message.append(" :You're not channel operator");
+
 		throw (err_box);
 	}
 }
