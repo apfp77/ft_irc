@@ -98,19 +98,15 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 	else if (recv_vector.size() > 2)
 	{
-		std::cout << "topic" << std::endl;
 		if (topic_ch->get_mode_topic() && !topic_ch->find_cli_in_gm_lst(cli))
 		{
-			std::cout << "topic1" << std::endl;
 			ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
 			return ;
 		}
-		std::cout << "topic2" << std::endl;
 		topic_ch->set_topic(cli, recv_vector[2]);
 		std::string s = ":" + cli->get_nick_name() + " TOPIC " + topic_ch->get_ch_name() + " :" + topic_ch->get_topic();
 		ft_send("", s, cli, false);
 		topic_ch->send_to_ch(s, cli);
-		std::cout << "topic3" << std::endl;
 	}
 }
 

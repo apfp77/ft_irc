@@ -55,8 +55,10 @@ std::set<Client *>::size_type Channel::get_cli_lst_size() const { return (this->
 bool Channel::find_cli_in_gm_lst(Client *cli)
 {
 	std::set<Client *>::iterator it = this->gm_lst.find(cli);
-	if (it != cli_lst.end())
+	if (it != gm_lst.end())
+	{
 		return (true);
+	}
 	return (false);
 }
 
