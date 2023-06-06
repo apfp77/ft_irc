@@ -262,13 +262,13 @@ Client* Server::find_cli_with_nick_name(std::string &nick_name)
 
 Channel* Server::find_ch_with_ch_name(std::string &channel_name)
 {
-	std::set<Channel *>::iterator it = this->ch_set.begin();
-	for (; it != this->ch_set.end(); ++it)
-	{
-		if ((*it)->get_ch_name() == channel_name)
-			return ((*it));
-	}
-	return (NULL);
+    std::set<Channel *>::iterator it = this->ch_set.begin();
+    for (; it != this->ch_set.end(); ++it)
+    {
+        if (!((*it)->get_ch_name().compare(channel_name)))
+            return ((*it));
+    }
+    return (NULL);
 }
 
 bool Server::check_pass_flag_cli_exit(Client *cli)
