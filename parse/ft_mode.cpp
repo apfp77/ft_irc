@@ -185,8 +185,6 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 	std::string ch_name = recv_vector[1];
 	Channel *ch = serv.find_ch_with_ch_name(ch_name);
-	// std::vector<
-	// 조회용, ex) /mode #channel
 	if (recv_vector.size() < 3)
 		ft_send(RPL_CHANNELMODEIS, cli->get_nick_name() + " " + ch_name + " " + ch->total_mode_string() , cli, false);
 	else if (ch->find_cli_in_gm_lst(cli) == false)
@@ -195,9 +193,16 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		ft_mode_execute(recv_vector, ch, cli, messages);
 	if (messages[0].length() != 0)
 	{
-		std::string send_mesasge = ":" + cli->get_nick_name() + " MODE " + ch->get_ch_name();
+		std::string send_mesasge = ":" + cli->get_nick_name() + " MODE " + ch->get_ch_name() + " ";
+		int flag = false;
+		if (messages[0].length() > 1)
+		{
+			flag = true;
+			send_mesasge += messages[0];
+		}
 		if (messages[1].length() != 0)
 			send_mesasge += messages[1];
-		ch->all_send_to_ch(send_mesasge);
+		if (flag)
+			ch->all_send_to_ch(send_mesasge);
 	}
 }

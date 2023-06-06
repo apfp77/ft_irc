@@ -1,22 +1,23 @@
 #include "parse.hpp"
 
-void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+bool ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-	if (cli->pass_flag == true)
-		ft_send(ERR_ALREADYREGISTERED, ":You may not reregister", cli, true);
 	if (recv_vector.size() == 2 && !recv_vector[1].compare(serv.get_passwd()))
 	{
 		cli->pass_flag = true;
-		return ;
+		return (false);
 	}
-	/*
-		Todo
-		패스워드가 일치하지 않을 경우 연결 끊는 작업 필요(close, client delete, pollfd 등)
-	*/
 	if (recv_vector.size() != 2)
+	{
 		ft_send(ERR_NEEDMOREPARAMS, ":Not enough parameters", cli, true);
+		serv.check_pass_flag_cli_exit(cli);
+	}
 	else
-		ft_send(ERR_PASSWDMISMATCH, ":Password incorrect", cli, true);
+	{
+		serv.password_err_message(cli);
+		serv.check_pass_flag_cli_exit(cli);
+	}
+	return (true);
 }
 
 void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
@@ -29,34 +30,6 @@ void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	std::string ret = "PONG " + recv_vector[1] + "\r\n";
 	ft_send("", ret, cli, false);
 	(void)serv;
-}
-
-void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	/*
-		1. ERR_NOICKGIVEN: 매개변수가 없는경우
-		2. ERR_ERRONEUSNICKNAME: nick에 허용하지 않는 문자가 포함될 경우
-		3. ERR_NICKNAMEINUSE: 이미 동일한 nick이 존재할경우
-		4. ERR_NICKCOLLISION: 다른 서버에 nick이 존재할경우 (우리 서버는 하나이므로 처리하지 않음)
-	*/
-	if (recv_vector.size() != 2)
-		ft_send(ERR_NONICKNAMEGIVEN, ":No nickname given", cli, true);
-	else if (!string_isalnum(recv_vector[1]))
-		ft_send(ERR_ERRONEUSNICKNAME, ":Erroneus nickname", cli, true);
-	else if (serv.find_cli_with_nick_name(recv_vector[1]))
-		ft_send(ERR_NICKNAMEINUSE, ":Nickname is already in use", cli, true);
-	else
-	{
-		// 	ft_send(RPL_WELCOME, ":Welcome to the ft_irc Network " + recv_vector[1] , cli, false);
-		//현재 클라이언트가 접속한 ip를 띄울것
-		if (cli->get_nick_name() == "")
-		{
-			ft_send(RPL_WELCOME, recv_vector[1] + " :Welcome to the ft_irc Network " + recv_vector[1] , cli, false);
-			ft_send(RPL_YOURHOST, recv_vector[1] + " :Your nickname is " + recv_vector[1] + ", running version", cli, false);
-			serv.insert_cli(cli);
-		}
-		cli->set_nick_name(recv_vector[1]);
-	}
 }
 
 void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
@@ -207,7 +180,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 		인증 전에 PING과 QUIT, 등록되지 않은 명령어를 제외한 명령어가 들어오면
 			클라이언트와의 연결을 끊는다
 	*/
-	
 	std::vector <std::vector<std::string> > parse_split;
 	std::vector <std::string> recv_vector;
 	recv_vector = ft_split(recv, "\r\n");
@@ -216,48 +188,77 @@ void parse(std::string recv, Client *cli, Server &serv)
 	recv_vector.clear();
 	for (std::vector <std::vector<std::string> >::size_type i = 0; i < parse_split.size(); i++)
 	{
-		recv_vector = parse_split[i];
-		switch(serv.get_cmd(recv_vector[0].c_str()))
+		if (cli->pass_flag == true)
 		{
-			case PING:
-				ft_ping(recv_vector, cli, serv);
-				break;	
-			case PASS:
-				ft_pass(recv_vector, cli, serv);
-				break;
-			case NICK:
-				ft_nick(recv_vector, cli, serv);
-				break;
-			case NAMES:
-				ft_names(recv_vector, cli, serv);
-				break;
-			case PRIVMSG:
-				ft_privmsg(recv_vector, cli, serv);
-				break;
-			case TOPIC:
-				ft_topic(recv_vector, cli, serv);
-				break;
-			case JOIN:
-				ft_join(recv_vector, cli, serv);
-				break;
-			case MODE:
-				ft_mode(recv_vector, cli, serv);
-				break;
-			case KICK:
-				ft_kick(recv_vector, cli, serv);
-				break;
-			case QUIT:
-				ft_quit(recv_vector, cli, serv);
-				break;
-			case INVITE:
-				ft_quit(recv_vector, cli, serv);
-				break;
-			case CAP:
-				ft_cap(recv_vector, cli, serv);
-				break;
-			default:
-				ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
-				break;
+			recv_vector = parse_split[i];
+			switch(serv.get_cmd(recv_vector[0].c_str()))
+			{
+				case PING:
+					ft_ping(recv_vector, cli, serv);
+					break;	
+				case PASS:
+					std::cout << "TEST" << '\n';
+					ft_send(ERR_ALREADYREGISTERED, ":You may not reregister", cli, true);
+					break;
+				case NICK:
+					ft_nick(recv_vector, cli, serv);
+					break;
+				case NAMES:
+					ft_names(recv_vector, cli, serv);
+					break;
+				case PRIVMSG:
+					ft_privmsg(recv_vector, cli, serv);
+					break;
+				case TOPIC:
+					ft_topic(recv_vector, cli, serv);
+					break;
+				case JOIN:
+					ft_join(recv_vector, cli, serv);
+					break;
+				case MODE:
+					ft_mode(recv_vector, cli, serv);
+					break;
+				case KICK:
+					ft_kick(recv_vector, cli, serv);
+					break;
+				case QUIT:
+					ft_quit(recv_vector, cli, serv);
+					break;
+				case INVITE:
+					ft_invite(recv_vector, cli, serv);
+					break;
+				case CAP:
+					ft_cap(recv_vector, cli, serv);
+					break;
+				default:
+					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
+					break;
+			}
+		}
+		else
+		{
+			recv_vector = parse_split[i];
+			switch(serv.get_cmd(recv_vector[0].c_str()))
+			{
+				case PASS:
+					if (ft_pass(recv_vector, cli, serv))
+						return ;
+					break;
+				case CAP:
+					ft_cap(recv_vector, cli, serv);
+					break;
+				case NICK:
+					if (ft_connect_nick(recv_vector, cli, serv))
+					{
+						cli->pass_flag = false;
+						serv.check_pass_flag_cli_exit(cli);
+						return ;
+					}
+					break;
+				default:
+					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
+					break;
+			}
 		}
 	}
 	parse_split.clear();
