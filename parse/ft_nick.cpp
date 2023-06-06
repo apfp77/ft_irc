@@ -33,5 +33,9 @@ void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	else if (serv.find_cli_with_nick_name(recv_vector[1]))
 		ft_send(ERR_NICKNAMEINUSE, ":Nickname is already in use", cli, true);
 	else
+	{
+		ft_send(RPL_WELCOME, recv_vector[1] + " :Welcome to the ft_irc Network " + recv_vector[1] , cli, false);
+		ft_send(RPL_YOURHOST, recv_vector[1] + " :Your nickname is " + recv_vector[1] + ", running version", cli, false);
 		cli->set_nick_name(recv_vector[1]);
+	}
 }
