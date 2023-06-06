@@ -197,7 +197,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 					ft_ping(recv_vector, cli, serv);
 					break;	
 				case PASS:
-					std::cout << "TEST" << '\n';
 					ft_send(ERR_ALREADYREGISTERED, ":You may not reregister", cli, true);
 					break;
 				case NICK:
