@@ -283,6 +283,7 @@ bool Server::check_pass_flag_cli_exit(Client *cli)
 		{
 			if (fds[i].fd == cli->get_socket())
 			{
+				ft_send(ERR_PASSWDMISMATCH, " :Password incorrect", cli, false);
 				delete_cli(cli);
 				delete cli;
 				close(fds[i].fd);

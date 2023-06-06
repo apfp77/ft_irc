@@ -3,7 +3,11 @@
 void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	if (cli->pass_flag == true)
+	{
 		ft_send(ERR_ALREADYREGISTERED, ":You may not reregister", cli, true);
+		return ;
+	}
+
 	if (recv_vector.size() == 2 && !recv_vector[1].compare(serv.get_passwd()))
 	{
 		cli->pass_flag = true;
@@ -13,10 +17,16 @@ void ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		Todo
 		패스워드가 일치하지 않을 경우 연결 끊는 작업 필요(close, client delete, pollfd 등)
 	*/
-	if (recv_vector.size() != 2)
-		ft_send(ERR_NEEDMOREPARAMS, ":Not enough parameters", cli, true);
+	// if (recv_vector.size() != 2)
+	// {
+	// 	ft_send(ERR_NEEDMOREPARAMS, ":Not enough parameters", cli, true);
+	// 	return ;
+	// }
 	else
-		ft_send(ERR_PASSWDMISMATCH, ":Password incorrect", cli, true);
+	{
+		ft_send(ERR_PASSWDMISMATCH, "you :Password incorrect", cli, true);
+		return ;
+	}
 }
 
 void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
@@ -225,8 +235,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 				ft_pass(recv_vector, cli, serv);
 				break;
 			case NICK:
-				if (serv.check_pass_flag_cli_exit(cli) == true)
-					return ;
 				ft_nick(recv_vector, cli, serv);
 				break;
 			case NAMES:
