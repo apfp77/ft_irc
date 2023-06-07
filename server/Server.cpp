@@ -120,7 +120,12 @@ void Server::execute()
 			if (fds[i].revents & POLLHUP || fds[i].revents & POLLERR)
 			{
 				// std::cout << i << ": 지워짐" << '\n';
+				std::cerr << "ch_size: " << this->ch_set.size() << std::endl;
+				std::cerr << "cli_size: " << this->cli_set.size() << std::endl;
 				erase_clinet(fds[i]);
+				std::cerr << "지운 후" << std::endl;
+				std::cerr << "ch_size: " << this->ch_set.size() << std::endl;
+				std::cerr << "cli_size: " << this->cli_set.size() << std::endl;
 			}
 		}
 	} 
@@ -173,18 +178,21 @@ void Server::cli_belong_channel_delete(Client *cli)
 	std::set<Channel *>::iterator tmp;
 	for (; it != ch_set.end();)
 	{
+		tmp = it;
 		int check = 0;
-		if ((*it)->find_cli_in_ch(cli) == NULL)
-			continue ;
-		check = (*it)->get_cli_lst_size();
-		(*it)->delete_gm_cli_and_cli(cli);
-		if (check == 1)
+		if ((*it)->find_cli_in_ch(cli) != NULL)
 		{
-			delete_ch(*it);
-			tmp = it;
-			++it;
-			delete (*tmp);
+			check = (*it)->get_cli_lst_size();
+			(*it)->delete_gm_cli_and_cli(cli);
+			if (check == 1)
+			{
+				delete_ch(*it);
+				++it;
+				delete (*tmp);
+			}
 		}
+		if (check != 0)
+			++it;
 	}
 }
 
@@ -313,5 +321,8 @@ pollfd *Server::find_fds(int socket_num)
 	}
 	return (NULL);
 }
+
+std::set<Channel *>::size_type Server::get_ch_set_size() const { return (this->ch_set.size()); }
+std::set<Client *>::size_type Server::get_cli_set_size() const { return (this->cli_set.size()); }
 
 Server::~Server(){}

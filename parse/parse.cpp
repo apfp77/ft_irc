@@ -156,7 +156,6 @@ void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -223,9 +222,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 				case INVITE:
 					ft_invite(recv_vector, cli, serv);
 					break;
-				case CAP:
-					ft_cap(recv_vector, cli, serv);
-					break;
 				default:
 					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 					break;
@@ -243,14 +239,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 				case CAP:
 					ft_cap(recv_vector, cli, serv);
 					break;
-				// case NICK:
-				// 	if (ft_connect_nick(recv_vector, cli, serv))
-				// 	{
-				// 		cli->pass_flag = false;
-				// 		serv.check_pass_flag_cli_exit(cli);
-				// 		return ;
-				// 	}
-				// 	break;
 				default:
 					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 					break;
