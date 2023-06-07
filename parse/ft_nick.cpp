@@ -8,7 +8,10 @@
 */
 bool ft_connect_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-	if (recv_vector.size() == 2 && string_isalnum(recv_vector[1]) && !serv.find_cli_with_nick_name(recv_vector[1]))
+	if (recv_vector.size() == 2 
+			&& string_isalnum(recv_vector[1]) 
+			&& !serv.find_cli_with_nick_name(recv_vector[1]) 
+			&& cli->pass_flag == true)
 	{
 		ft_send(RPL_WELCOME, recv_vector[1] + " :Welcome to the ft_irc Network " + recv_vector[1] , cli, false);
 		ft_send(RPL_YOURHOST, recv_vector[1] + " :Your nickname is " + recv_vector[1] + ", running version", cli, false);
@@ -21,6 +24,11 @@ bool ft_connect_nick(std::vector<std::string> &recv_vector, Client *cli, Server 
 		ft_send(ERR_ERRONEUSNICKNAME, ":Erroneus nickname", cli, true);
 	else if (serv.find_cli_with_nick_name(recv_vector[1]))
 		ft_send(ERR_NICKNAMEINUSE, ":Nickname is already in use", cli, true);
+	if (cli->pass_flag == false)
+	{
+		pollfd *p_fd = serv.find_fds(cli->get_socket());
+		p_fd->revents = POLLHUP;
+	}
 	return (true);
 }
 

@@ -186,20 +186,24 @@ void Server::erase_clinet(pollfd &fds)
 void Server::cli_belong_channel_delete(Client *cli)
 {
 	std::set<Channel *>::iterator it = this->ch_set.begin();
-	std::set<Channel *>::iterator tmp;
-	for (; it != ch_set.end();)
+	std::set<Channel *>::iterator tmp = it;
+	
+	while(it != ch_set.end())
 	{
-		int check = 0;
+		int cli_size_in_ch = 0;
 		if ((*it)->find_cli_in_ch(cli) == NULL)
-			continue ;
-		check = (*it)->get_cli_lst_size();
-		(*it)->delete_gm_cli_and_cli(cli);
-		if (check == 1)
 		{
-			delete_ch(*it);
-			tmp = it;
 			++it;
-			delete (*tmp);
+			continue;
+		}
+		cli_size_in_ch = (*it)->get_cli_lst_size();
+		(*it)->delete_gm_cli_and_cli(cli);
+		if (cli_size_in_ch == 1)
+		{
+			tmp = this->ch_set.erase(it);
+			delete_ch(*it);
+			delete (*it);
+			it = tmp;
 		}
 	}
 }
@@ -320,6 +324,18 @@ bool Server::check_pass_flag_cli_exit(Client *cli)
 	return (false);
 }
 
+pollfd *Server::find_fds(int socket_num)
+{
+	for (int i = 1; i < MAXCLIENT + 1; i++)
+	{
+		if (this->fds[i].fd == socket_num)
+			return (&(this->fds[i]));
+	}
+	return (NULL);
+}
+
+std::set<Channel *>::size_type Server::get_ch_set_size() const { return (this->ch_set.size()); }
+std::set<Client *>::size_type Server::get_cli_set_size() const { return (this->cli_set.size()); }
 
 Server::~Server()
 {
