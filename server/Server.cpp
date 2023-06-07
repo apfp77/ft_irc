@@ -109,20 +109,21 @@ void Server::execute()
 		}
 		for (int i = 1; i < MAXCLIENT + 1; i++)
 		{
+			// std::cout << i << ": " << fds[i].revents << " 상태보고" << std::endl;
 			if (fds[i].fd == -1)
 				continue ;
 			if (fds[i].revents & POLLIN)
 			{
-				// std::cout << "문자받음" << std::endl;
+				// std::cout << i << " 문자받음" << std::endl;
 				message_receive(fds[i]);
 			}
 			if (fds[i].revents & POLLHUP || fds[i].revents & POLLERR)
 			{
-				// std::cout << "클라이언트 지워짐" << std::endl;
+				// std::cout << i << ": 지워짐" << '\n';
 				erase_clinet(fds[i]);
 			}
 		}
-	}
+	} 
 }
 
 void Server::accept_client()
@@ -169,7 +170,8 @@ void Server::erase_clinet(pollfd &fds)
 void Server::cli_belong_channel_delete(Client *cli)
 {
 	std::set<Channel *>::iterator it = this->ch_set.begin();
-	for (; it != ch_set.end(); it++)
+	std::set<Channel *>::iterator tmp;
+	for (; it != ch_set.end();)
 	{
 		int check = 0;
 		if ((*it)->find_cli_in_ch(cli) == NULL)
@@ -179,7 +181,9 @@ void Server::cli_belong_channel_delete(Client *cli)
 		if (check == 1)
 		{
 			delete_ch(*it);
-			delete (*it);
+			tmp = it;
+			++it;
+			delete (*tmp);
 		}
 	}
 }
@@ -209,7 +213,7 @@ void Server::message_receive(pollfd &fds)
 
 	if (message_size != -1)
 		buffer[message_size] = '\0';
-	// std::cout << "받은 문자" << buffer << std::endl;
+	// std::cout << "받은 문자" << buffer << '\n';
 	if (message_size == -1)
 		throw (1);
 	client = this->find_client(fds.fd);

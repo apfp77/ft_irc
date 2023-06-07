@@ -5,6 +5,7 @@
 #include "Mode.hpp"
 #include "Client.hpp"
 #include <set>
+#include <vector>
 
 /*
 	채널 동작방식
@@ -45,6 +46,7 @@ class Channel : public Mode {
 		Client* find_cli_in_gm_ch(Client *cli);
 		Client* find_cli_in_ch_by_str(std::string &str);
 		bool find_cli_in_gm_lst(Client *cli);
+		Client* find_cli_in_gm_lst_by_str(std::string &str);
 
 		void send_to_ch(std::string &message, Client *cli);
 		void all_send_to_ch(std::string &message);
@@ -60,6 +62,8 @@ class Channel : public Mode {
 		void set_topic(Client *cli, std::string &new_message);
 		
 		bool find_invite_cli(Client *cli);
+
+		std::vector<std::string> get_cli_names_in_ch();
 };
 
 #endif

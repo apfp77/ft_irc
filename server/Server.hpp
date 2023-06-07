@@ -22,6 +22,7 @@
 #include <cctype>
 
 #define MAXCLIENT 20
+#define SERVER_NAME "FT_IRC "
 
 class Server {
 	private:
