@@ -175,24 +175,25 @@ void Server::erase_clinet(pollfd &fds)
 void Server::cli_belong_channel_delete(Client *cli)
 {
 	std::set<Channel *>::iterator it = this->ch_set.begin();
-	std::set<Channel *>::iterator tmp;
-	for (; it != ch_set.end();)
+	std::set<Channel *>::iterator tmp = it;
+	
+	while(it != ch_set.end())
 	{
-		tmp = it;
-		int check = 0;
-		if ((*it)->find_cli_in_ch(cli) != NULL)
+		int cli_size_in_ch = 0;
+		if ((*it)->find_cli_in_ch(cli) == NULL)
 		{
-			check = (*it)->get_cli_lst_size();
-			(*it)->delete_gm_cli_and_cli(cli);
-			if (check == 1)
-			{
-				delete_ch(*it);
-				++it;
-				delete (*tmp);
-			}
-		}
-		if (check != 0)
 			++it;
+			continue;
+		}
+		cli_size_in_ch = (*it)->get_cli_lst_size();
+		(*it)->delete_gm_cli_and_cli(cli);
+		if (cli_size_in_ch == 1)
+		{
+			tmp = this->ch_set.erase(it);
+			delete_ch(*it);
+			delete (*it);
+			it = tmp;
+		}
 	}
 }
 
