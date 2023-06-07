@@ -32,7 +32,7 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 		check_me_belong_channel(channel, cli);
 		check_me_operator_in_channel(channel, cli);
-		std::vector<std::string> users = check_kick_target_in_channel(channel, cli, recv_vector[3]);
+		std::vector<std::string> users = check_kick_target_in_channel(channel, cli, recv_vector[2]);
 		send_message_channel_member(recv_vector, channel, users, cli);
 		delete_server_in_channel(channel, serv);
 	}
@@ -117,24 +117,25 @@ static std::vector<std::string> check_kick_target_in_channel(Channel *channel, C
 {
 
 	std::vector<std::string> users = ft_split(recv_vector, ",");
-	siz_t end = users.size();
-	for (siz_t i = 0; i < end;)
+	std::vector<std::string>::iterator it = users.begin();
+	for (;it != users.end();)
 	{
 		try{
-			if (channel->find_cli_in_ch_by_str(users[i]) == NULL)
+			if (channel->find_cli_in_ch_by_str((*it)) == NULL)
 			{
-				users.erase(users.begin() + i);
 				t_err_box err_box;
 				err_box.err_code = ERR_USERNOTINCHANNEL;
-
 				err_box.err_message.append(cli->get_nick_name());
+				err_box.err_message.append(" ");
+				err_box.err_message.append((*it));
 				err_box.err_message.append(" ");
 				err_box.err_message.append(channel->get_ch_name());
 				err_box.err_message.append(" :They aren't on that channel");
 
+				users.erase(it);
 				throw (err_box);
 			}
-			i++;
+			++it;
 		}
 		catch(t_err_box err_box)
 		{
@@ -203,7 +204,8 @@ static void check_me_operator_in_channel(Channel *channel, Client *cli)
 	if (channel->find_cli_in_gm_ch(cli) == NULL)
 	{
 		t_err_box err_box;
-		err_box.err_code = ERR_CHANOPRIVSNEEDED;
+		err_box.err_code = ":10.32.5.1 ";
+		err_box.err_code += ERR_CHANOPRIVSNEEDED;
 
 		err_box.err_message.append(cli->get_nick_name());
 		err_box.err_message.append(" ");

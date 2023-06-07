@@ -73,7 +73,7 @@ Client* Channel::find_cli_in_ch(Client *cli)
 Client* Channel::find_cli_in_gm_ch(Client *cli)
 {
 	std::set<Client *>::iterator it = this->gm_lst.find(cli);
-	if (it != cli_lst.end())
+	if (it != gm_lst.end())
 		return ((*it));
 	return (NULL);
 }
