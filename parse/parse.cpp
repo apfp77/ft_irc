@@ -67,7 +67,8 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	{
 		if (topic_ch->get_mode_topic() && !topic_ch->find_cli_in_gm_lst(cli))
 		{
-			ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
+			// ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
+			ft_send(ERR_CHANOPRIVSNEEDED, cli->get_nick_name() + " " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
 			return ;
 		}
 		topic_ch->set_topic(cli, recv_vector[2]);
@@ -104,14 +105,15 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	std::vector <std::vector<std::string> >::size_type ch_size;
 	std::vector <std::vector<std::string> >::size_type pw_size;
 	ch_split = ft_split(recv_vector[1], ",");
-	pw_split = ft_split(recv_vector[2], ",");
 	ch_size = ch_split.size();
-	pw_size = pw_split.size();
-	while (pw_size < ch_size)
+	if (recv_vector.size() == 2)
 	{
-		pw_split.push_back("");
-		pw_size++;
+		for (std::vector <std::vector<std::string> >::size_type i = 0; i < ch_size; i++)
+			pw_split.push_back("");
 	}
+	else
+		pw_split = ft_split(recv_vector[2], ",");
+	pw_size = pw_split.size();
 	for (std::vector <std::vector<std::string> >::size_type i = 0; i < ch_size; i++)
 	{
 		Channel *join_ch = serv.find_ch_with_ch_name(ch_split[i]);
