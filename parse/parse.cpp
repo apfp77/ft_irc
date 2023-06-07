@@ -196,7 +196,8 @@ void parse(std::string recv, Client *cli, Server &serv)
 					ft_send(ERR_ALREADYREGISTERED, ":You may not reregister", cli, true);
 					break;
 				case NICK:
-					ft_nick(recv_vector, cli, serv);
+					if (ft_connect_nick(recv_vector, cli, serv))
+						return ;
 					break;
 				case NAMES:
 					ft_names(recv_vector, cli, serv);
@@ -242,14 +243,14 @@ void parse(std::string recv, Client *cli, Server &serv)
 				case CAP:
 					ft_cap(recv_vector, cli, serv);
 					break;
-				case NICK:
-					if (ft_connect_nick(recv_vector, cli, serv))
-					{
-						cli->pass_flag = false;
-						serv.check_pass_flag_cli_exit(cli);
-						return ;
-					}
-					break;
+				// case NICK:
+				// 	if (ft_connect_nick(recv_vector, cli, serv))
+				// 	{
+				// 		cli->pass_flag = false;
+				// 		serv.check_pass_flag_cli_exit(cli);
+				// 		return ;
+				// 	}
+				// 	break;
 				default:
 					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 					break;

@@ -304,5 +304,14 @@ bool Server::check_pass_flag_cli_exit(Client *cli)
 	return (false);
 }
 
+pollfd *Server::find_fds(int socket_num)
+{
+	for (int i = 1; i < MAXCLIENT + 1; i++)
+	{
+		if (this->fds[i].fd == socket_num)
+			return (&(this->fds[i]));
+	}
+	return (NULL);
+}
 
 Server::~Server(){}
