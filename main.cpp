@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <exception>
+#include <signal.h>
 
 //isdigit
 #include <cctype>
@@ -14,8 +15,18 @@
 #define MAX_CLIENTS 10
 #include <unistd.h>
 
+
+// void signal_handle(int sig_num)
+// {
+// 	if (sig_num == SIGINT || sig_num == SIGQUIT)
+// 		return ;
+// }
+
 int main(int argc, char **argv)
 {
+	// signal(SIGINT, signal_handle);
+	// signal(SIGTERM, signal_handle);
+	// signal(SIGQUIT, signal_handle);
 	if (argc != 3)
 	{
 		std::cout << "input ./ircserv <port> <password>" << '\n';
