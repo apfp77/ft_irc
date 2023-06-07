@@ -89,6 +89,7 @@ void Server::make_event_window()
 {
 	fds[0].fd = this->srv_sock;
 	fds[0].events = POLLIN;
+	fds[1].events = POLLIN;
 	for (int i = 1; i < MAXCLIENT + 1; ++i)
 		fds[i].fd = -1;
 }
@@ -99,29 +100,40 @@ void Server::execute()
 	while (1)
 	{
 		int check = poll(fds, MAXCLIENT + 1, -1);
-		// std::cout << "이벤트 발생" << std::endl;
+		std::cout << "이벤트 발생" << std::endl;
 		if (check == -1)
+		{
+			if (errno == 4)
+				break ;
 			throw("poll() error");
-		if (fds[0].revents & POLLIN)
-		{
-			// std::cout << "연결했음" << std::endl;
-			accept_client();
 		}
-		for (int i = 1; i < MAXCLIENT + 1; i++)
+		try
 		{
-			// std::cout << i << ": " << fds[i].revents << " 상태보고" << std::endl;
-			if (fds[i].fd == -1)
-				continue ;
-			if (fds[i].revents & POLLIN)
+			if (fds[0].revents & POLLIN)
 			{
-				// std::cout << i << " 문자받음" << std::endl;
-				message_receive(fds[i]);
+				// std::cout << "연결했음" << std::endl;
+				accept_client();
 			}
-			if (fds[i].revents & POLLHUP || fds[i].revents & POLLERR)
+			for (int i = 2; i < MAXCLIENT + 1; i++)
 			{
-				// std::cout << i << ": 지워짐" << '\n';
-				erase_clinet(fds[i]);
+				// std::cout << i << ": " << fds[i].revents << " 상태보고" << std::endl;
+				if (fds[i].fd == -1)
+					continue ;
+				if (fds[i].revents & POLLIN)
+				{
+					// std::cout << i << " 문자받음" << std::endl;
+					message_receive(fds[i]);
+				}
+				if (fds[i].revents & POLLHUP || fds[i].revents & POLLERR)
+				{
+					// std::cout << i << ": 지워짐" << '\n';
+					erase_clinet(fds[i]);
+				}
 			}
+		}
+		catch(const char *str)
+		{
+			std::cout << str << std::endl;
 		}
 	} 
 }
@@ -129,29 +141,34 @@ void Server::execute()
 void Server::accept_client()
 {
 	Client *cli = new Client;
-	cli->set_socket(accept(this->srv_sock, reinterpret_cast<sockaddr*>(&cli->get_cil_addr()), &(cli->get_cli_size())));
-	if (cli->get_socket() == -1)
+	try
 	{
-		delete cli;
-		throw(1);
+		cli->set_socket(accept(this->srv_sock, reinterpret_cast<sockaddr*>(&cli->get_cil_addr()), &(cli->get_cli_size())));
+		if (cli->get_socket() == -1)
+			throw("accept() error");
+		cli->setting_socket();
+		this->find_vacant_fds().fd = cli->get_socket();
+		this->insert_cli(cli);
 	}
-	cli->setting_socket();
-	this->find_vacant_fds().fd = cli->get_socket();
-	this->insert_cli(cli);
+	catch(char *str)
+	{
+		std::cout << str << std::endl;
+		delete cli;
+	}
 	// std::cout << "생성된 클라이언트 소켓 " << cli->get_socket() << std::endl;
 }
 
 struct pollfd &Server::find_vacant_fds()
 {
-	for(int i = 1; i < MAXCLIENT + 1; i++)
+	for(int i = 2; i < MAXCLIENT + 1; i++)
 	{
 		if (this->fds[i].fd == -1)
 		{
-			// std::cout << i << "번째 fds 생성" << std::endl; // test용
 			this->fds[i].events = POLLIN | POLLERR | POLLHUP;
 			return (this->fds[i]);
 		}
 	}
+	throw ("Connection limit exceeded");
 	return (this->fds[0]);
 }
 
@@ -162,7 +179,6 @@ void Server::erase_clinet(pollfd &fds)
 	this->cli_belong_channel_delete(cli);
 	delete_cli(cli);
 	delete cli;
-	close(fds.fd);
 	fds.fd = -1;
 	fds.events = 0;
 }
@@ -305,4 +321,15 @@ bool Server::check_pass_flag_cli_exit(Client *cli)
 }
 
 
-Server::~Server(){}
+Server::~Server()
+{
+	std::set<Channel *>::iterator ch_it = this->ch_set.begin();
+    for (; ch_it != this->ch_set.end(); ++ch_it)
+        delete (*ch_it);
+	std::set<Client *>::iterator cli_it = this->cli_set.begin();
+	for (; cli_it != this->cli_set.end(); ++cli_it)
+        delete (*cli_it);
+	close(this->srv_sock);
+	system("leaks ircserv");
+	std::cout << "종료" << std::endl;
+}
