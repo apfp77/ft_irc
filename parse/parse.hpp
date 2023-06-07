@@ -26,6 +26,7 @@
 
 
 void parse(std::string recv, Client *cli, Server &serv);
+void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 bool ft_pass(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
@@ -34,10 +35,17 @@ void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_join_tmp(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_invite(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+
+/*
+	names
+*/
+void ret_join_after_names_message(Channel *ch, Client *cli);
+
 
 #endif

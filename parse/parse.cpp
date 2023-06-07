@@ -32,12 +32,6 @@ void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
-void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	(void)recv_vector;
-	(void)cli;
-	(void)serv;
-}
 
 /*
 	PASS를 통과하지 못하면 서버와의 연결을 끊어버린다
@@ -130,6 +124,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 			topic = "";
 			join_ch->set_topic(cli, topic);
 			serv.insert_ch(join_ch);
+			ret_join_after_names_message(join_ch, cli);
 		}
 		else
 		{
@@ -144,6 +139,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 				if (join_ch->get_topic() != "")
 					ft_send(RPL_TOPIC, "IRSSI " + join_ch->get_ch_name() + " :" + join_ch->get_topic(), cli, false);
 				join_ch->insert_cli(cli);
+				ret_join_after_names_message(join_ch, cli);
 			}
 		}
 	}
@@ -178,7 +174,7 @@ void parse(std::string recv, Client *cli, Server &serv)
 	/*
 		Todo
 		인증 전에 PING과 QUIT, 등록되지 않은 명령어를 제외한 명령어가 들어오면
-			클라이언트와의 연결을 끊는다
+		클라이언트와의 연결을 끊는다
 	*/
 	std::vector <std::vector<std::string> > parse_split;
 	std::vector <std::string> recv_vector;
