@@ -103,7 +103,6 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	std::vector <std::string> pw_split;
 	std::string topic;
 	std::vector <std::vector<std::string> >::size_type ch_size;
-	std::vector <std::vector<std::string> >::size_type pw_size;
 	ch_split = ft_split(recv_vector[1], ",");
 	ch_size = ch_split.size();
 	if (recv_vector.size() == 2)
@@ -113,7 +112,6 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	}
 	else
 		pw_split = ft_split(recv_vector[2], ",");
-	pw_size = pw_split.size();
 	for (std::vector <std::vector<std::string> >::size_type i = 0; i < ch_size; i++)
 	{
 		Channel *join_ch = serv.find_ch_with_ch_name(ch_split[i]);
