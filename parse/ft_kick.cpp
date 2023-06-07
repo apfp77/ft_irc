@@ -48,7 +48,7 @@ static std::string merge_explain_message(std::vector<std::string> &recv_vector, 
 void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	t_kick_data k_data;
-	
+
 	make_up_data(recv_vector, cli, serv, k_data);
 	try
 	{
@@ -96,10 +96,10 @@ static void make_up_data(std::vector<std::string> &recv_vector, Client *cli, Ser
 				k_data.im_in_channel = false;
 			if (k_data.channel->find_cli_in_gm_ch(cli) == NULL)
 				k_data.im_operator = false;
+		}
 			k_data.erase_user_name = ft_split(recv_vector[2], ",");
 			k_data.send_first_mention = merge_kick_channel_message(recv_vector);
 			k_data.explain = merge_explain_message(recv_vector, k_data.nick, k_data.parameters);
-		}
 	}
 }
 
