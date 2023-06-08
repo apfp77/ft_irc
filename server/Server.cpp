@@ -18,24 +18,18 @@ bool Server::is_num(char *s)
 
 Server::Server(char *srv_port, char *passwd) : passwd(passwd)
 {
-	try
-	{
-		if(this->is_num(srv_port) == false)
+		if (this->is_num(srv_port) == false)
 			throw ("is not num");
+		std::stringstream ss(srv_port);
+		ss >> this->srv_port;
+		if (this->srv_port > 65535)
+			throw("is over port max");
 		std::string str = passwd;
 		if (str.empty())
 			throw("empty passwd");
 		int len = str.length();
 		if (len < 1 || len > 11)
 			throw("len_worng passwd");
-	}
-	catch(const char *str)
-	{
-		std::cerr << str << std::endl;
-		throw (1);
-	}
-	std::stringstream ss(srv_port);
-	ss >> this->srv_port;
 }
 
 void Server::parse_map_init()
@@ -63,17 +57,10 @@ void Server::init()
 	this->serv_addr.sin_family = AF_INET;
 	this->serv_addr.sin_addr.s_addr = INADDR_ANY;
 	this->serv_addr.sin_port = htons(this->srv_port);
-
 	if (bind(this->srv_sock, reinterpret_cast<sockaddr*>(&serv_addr), sizeof(serv_addr)) == -1)
-	{
-		std::cerr << "bind() error" << std::endl;
-		throw (errno);
-	}
+		throw ("bind() error");
 	if (listen(this->srv_sock, 5) == -1)
-	{
-		std::cerr << "listen() error" << std::endl;
-		throw (errno);
-	}
+		throw("listen() error");
 }
 
 void Server::setting_socket(int srv_sock)
@@ -103,7 +90,7 @@ void Server::execute()
 		if (check == -1)
 		{
 			if (errno == 4)
-				break ;
+				throw("signal exit");
 			throw("poll() error");
 		}
 		try
@@ -147,11 +134,20 @@ void Server::accept_client()
 		cli->set_socket(accept(this->srv_sock, reinterpret_cast<sockaddr*>(&cli->get_cil_addr()), &(cli->get_cli_size())));
 		if (cli->get_socket() == -1)
 			throw("accept() error");
-		cli->setting_socket();
-		this->find_vacant_fds().fd = cli->get_socket();
-		this->insert_cli(cli);
+		try
+		{
+			cli->setting_socket();
+			this->find_vacant_fds().fd = cli->get_socket();
+			this->insert_cli(cli);
+		}
+		catch(const char *str)
+		{
+			close(cli->get_socket());
+			throw ;
+		}
+		
 	}
-	catch(char *str)
+	catch(const char *str)
 	{
 		std::cout << str << std::endl;
 		delete cli;
