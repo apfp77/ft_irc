@@ -231,6 +231,9 @@ void parse(std::string recv, Client *cli, Server &serv)
 				case INVITE:
 					ft_invite(recv_vector, cli, serv);
 					break;
+				case PART:
+					ft_part(recv_vector, cli, serv);
+					break;
 				default:
 					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 					break;
