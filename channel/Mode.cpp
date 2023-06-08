@@ -67,3 +67,13 @@ Mode::~Mode()
 {
 
 }
+
+bool Mode::check_cli_in_invite_cli_set(Client *cli)
+{
+	std::set<Client *>::iterator it = this->invite_cli_set.find(cli);
+	if (it != this->invite_cli_set.end())
+	{
+		return (true);
+	}
+	return (false);
+}

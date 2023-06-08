@@ -100,7 +100,7 @@ void Server::execute()
 	while (1)
 	{
 		int check = poll(fds, MAXCLIENT + 1, -1);
-		std::cout << "이벤트 발생" << std::endl;
+		// std::cout << "이벤트 발생" << std::endl;
 		if (check == -1)
 		{
 			if (errno == 4)
