@@ -117,14 +117,22 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		Channel *join_ch = serv.find_ch_with_ch_name(ch_split[i]);
 		if (join_ch == NULL)
 		{
-			join_ch = new Channel(ch_split[i], cli);
-			join_ch->insert_cli(cli);
-			join_ch->insert_cli_gm(cli);
-			join_ch->set_passwd(pw_split[i]);
-			topic = "";
-			join_ch->set_topic(cli, topic);
-			serv.insert_ch(join_ch);
-			ret_join_after_names_message(join_ch, cli);
+			try
+			{
+				join_ch = new Channel(ch_split[i], cli);
+				join_ch->insert_cli(cli);
+				join_ch->insert_cli_gm(cli);
+				join_ch->set_passwd(pw_split[i]);
+				topic = "";
+				join_ch->set_topic(cli, topic);
+				serv.insert_ch(join_ch);
+				ret_join_after_names_message(join_ch, cli);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << "Cannnot join the channel :" << e.what() << std::endl;
+				ft_send(ERR_TOOMANYCHANNELS, "IRSSI " + ch_split[i] + " :You have joined too many channels", cli, true);
+			}
 		}
 		else
 		{
