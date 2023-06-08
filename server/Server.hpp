@@ -22,6 +22,7 @@
 #include <cctype>
 
 #define MAXCLIENT 20
+#define SERVER_NAME "FT_IRC "
 
 class Server {
 	private:
@@ -64,9 +65,12 @@ class Server {
 		Channel* find_ch_with_ch_name(std::string &channel_name);
 		Client* find_cli_with_nick_name(std::string &nick_name);
 
+		std::set<Channel *>::size_type get_ch_set_size() const;
+		std::set<Client *>::size_type get_cli_set_size() const;
+
 		bool check_pass_flag_cli_exit(Client *cli);
 		void password_err_message(Client *cli);
-		pollfd& find_fds(int socket_num);
+		pollfd* find_fds(int socket_num);
 		~Server();
 
 };

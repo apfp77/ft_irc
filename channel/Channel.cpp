@@ -118,3 +118,28 @@ void Channel::all_send_to_ch(std::string &message)
 }
 
 Channel::~Channel(){}
+
+std::vector<std::string> Channel::get_cli_names_in_ch()
+{
+	std::vector<std::string> ret;
+	std::set<Client *>::iterator it = this->cli_lst.begin();
+	std::string tmp;
+	for(;it != this->cli_lst.end();++it)
+	{
+		ret.push_back((*it)->get_nick_name());
+	}
+	return (ret);
+}
+
+Client* Channel::find_cli_in_gm_lst_by_str(std::string &str)
+{
+	std::set<Client *>::iterator it = this->gm_lst.begin();
+	std::set<Client *>::iterator it_end = this->gm_lst.end();
+
+	for (; it != it_end; ++it)
+	{
+		if (!((*it)->get_nick_name().compare(str)))
+			return (*it);
+	}
+	return (NULL);
+}

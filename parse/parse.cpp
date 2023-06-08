@@ -32,12 +32,6 @@ void ft_ping(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	(void)serv;
 }
 
-void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
-{
-	(void)recv_vector;
-	(void)cli;
-	(void)serv;
-}
 
 /*
 	PASS를 통과하지 못하면 서버와의 연결을 끊어버린다
@@ -73,7 +67,8 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	{
 		if (topic_ch->get_mode_topic() && !topic_ch->find_cli_in_gm_lst(cli))
 		{
-			ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
+			// ft_send(ERR_CHANOPRIVSNEEDED, "IRSSI " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
+			ft_send(ERR_CHANOPRIVSNEEDED, cli->get_nick_name() + " " + topic_ch->get_ch_name() + " :You're not channel operator", cli, true);
 			return ;
 		}
 		topic_ch->set_topic(cli, recv_vector[2]);
@@ -108,16 +103,15 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	std::vector <std::string> pw_split;
 	std::string topic;
 	std::vector <std::vector<std::string> >::size_type ch_size;
-	std::vector <std::vector<std::string> >::size_type pw_size;
 	ch_split = ft_split(recv_vector[1], ",");
-	pw_split = ft_split(recv_vector[2], ",");
 	ch_size = ch_split.size();
-	pw_size = pw_split.size();
-	while (pw_size < ch_size)
+	if (recv_vector.size() == 2)
 	{
-		pw_split.push_back("");
-		pw_size++;
+		for (std::vector <std::vector<std::string> >::size_type i = 0; i < ch_size; i++)
+			pw_split.push_back("");
 	}
+	else
+		pw_split = ft_split(recv_vector[2], ",");
 	for (std::vector <std::vector<std::string> >::size_type i = 0; i < ch_size; i++)
 	{
 		Channel *join_ch = serv.find_ch_with_ch_name(ch_split[i]);
@@ -130,6 +124,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 			topic = "";
 			join_ch->set_topic(cli, topic);
 			serv.insert_ch(join_ch);
+			ret_join_after_names_message(join_ch, cli);
 		}
 		else
 		{
@@ -144,6 +139,7 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 				if (join_ch->get_topic() != "")
 					ft_send(RPL_TOPIC, "IRSSI " + join_ch->get_ch_name() + " :" + join_ch->get_topic(), cli, false);
 				join_ch->insert_cli(cli);
+				ret_join_after_names_message(join_ch, cli);
 			}
 		}
 	}
@@ -160,7 +156,6 @@ void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 
 void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
-	ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 	(void)recv_vector;
 	(void)cli;
 	(void)serv;
@@ -178,7 +173,7 @@ void parse(std::string recv, Client *cli, Server &serv)
 	/*
 		Todo
 		인증 전에 PING과 QUIT, 등록되지 않은 명령어를 제외한 명령어가 들어오면
-			클라이언트와의 연결을 끊는다
+		클라이언트와의 연결을 끊는다
 	*/
 	std::vector <std::vector<std::string> > parse_split;
 	std::vector <std::string> recv_vector;
@@ -200,7 +195,8 @@ void parse(std::string recv, Client *cli, Server &serv)
 					ft_send(ERR_ALREADYREGISTERED, ":You may not reregister", cli, true);
 					break;
 				case NICK:
-					ft_nick(recv_vector, cli, serv);
+					if (ft_connect_nick(recv_vector, cli, serv))
+						return ;
 					break;
 				case NAMES:
 					ft_names(recv_vector, cli, serv);
@@ -226,9 +222,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 				case INVITE:
 					ft_invite(recv_vector, cli, serv);
 					break;
-				case CAP:
-					ft_cap(recv_vector, cli, serv);
-					break;
 				default:
 					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
 					break;
@@ -245,14 +238,6 @@ void parse(std::string recv, Client *cli, Server &serv)
 					break;
 				case CAP:
 					ft_cap(recv_vector, cli, serv);
-					break;
-				case NICK:
-					if (ft_connect_nick(recv_vector, cli, serv))
-					{
-						cli->pass_flag = false;
-						serv.check_pass_flag_cli_exit(cli);
-						return ;
-					}
 					break;
 				default:
 					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);

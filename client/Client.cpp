@@ -60,4 +60,7 @@ void Client::set_nick_name(std::string &nick_name) { this->nick_name = nick_name
 
 std::string Client::get_nick_name() const { return (this->nick_name); }
 
-Client::~Client(){}
+Client::~Client()
+{
+	close(this->cli_sock);
+}
