@@ -60,8 +60,6 @@ class Channel : public Mode {
 
 		std::string get_topic() const;
 		void set_topic(Client *cli, std::string &new_message);
-		
-		bool find_invite_cli(Client *cli);
 
 		std::vector<std::string> get_cli_names_in_ch();
 };
