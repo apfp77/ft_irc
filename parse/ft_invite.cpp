@@ -21,25 +21,43 @@ void ft_invite(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	Channel *ch = serv.find_ch_with_ch_name(recv_vector[2]);
 	if (ch == NULL)
 	{
-		ft_send(ERR_NOSUCHCHANNEL, cli->get_nick_name() + recv_vector[2] +   " :No such channel", cli, false);
+		ft_send(ERR_NOSUCHCHANNEL, cli->get_nick_name() + " " + recv_vector[2] +   " :No such channel", cli, false);
 		return ;
 	}
 	if (ch->find_cli_in_ch(cli) == NULL)
 	{
-		ft_send(ERR_NOTONCHANNEL, cli->get_nick_name() + recv_vector[2] +   " :You're not on that channel", cli, false);
+		ft_send(ERR_NOTONCHANNEL, cli->get_nick_name() + " " + recv_vector[2] +   " :You're not on that channel", cli, false);
 		return ;
 	}
 	Client *user = ch->find_cli_in_ch_by_str(recv_vector[1]);
 	if (user != NULL)
 	{
-		ft_send(ERR_USERONCHANNEL, cli->get_nick_name() + recv_vector[1] + " " + recv_vector[2] + ":is already on channel", cli, false);
+		ft_send(ERR_USERONCHANNEL, cli->get_nick_name() + " " + recv_vector[1] + " " + recv_vector[2] + ":is already on channel", cli, false);
 		return ;
 	}
-	if (ch->find_cli_in_gm_lst(cli))
+	// 1. ! 추가
+	if (!ch->find_cli_in_gm_lst(cli))
 	{
-		ft_send(ERR_CHANOPRIVSNEEDED, cli->get_nick_name() + recv_vector[2] + " :You're not channel operator", cli, false);
+		ft_send(ERR_CHANOPRIVSNEEDED, cli->get_nick_name() + " " + recv_vector[2] + " :You're not channel operator", cli, false);
 		return ;
 	}
-	std::string message = ":" + cli->get_nick_name() + " " + recv_vector[1] + " " + recv_vector[2];
+	//  서버에 유저가 있는지 확인
+	user = serv.find_cli_with_nick_name(recv_vector[1]);
+	if (user == NULL)
+	{
+		//  "<client> <nickname> :No such nick/channel"
+		ft_send(ERR_NOSUCHNICK, cli->get_nick_name() + " " + recv_vector[1] + " :No such nick/channel", cli, false);
+		return ;
+	}
+	ch->insert_invite_cli(user);
+	std::string message = ":";
+	message += SERVER_NAME;
+	message += RPL_INVITING;
+	message += " " + cli->get_nick_name() + " " + recv_vector[1] + " " + recv_vector[2];
 	ch->all_send_to_ch(message);
+	//노티스 추가해야할까?
+
+	//초대받은 클라이언트한테 메세지 보내기
+	message = ": " + cli->get_nick_name() + " INVITE " + recv_vector[1] + " " + recv_vector[2];
+	ft_send("", message, user, false);
 }

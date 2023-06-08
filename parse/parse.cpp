@@ -132,7 +132,8 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 				ft_send(ERR_BADCHANNELKEY, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+k)", cli, true);
 			else if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
 				ft_send(ERR_CHANNELISFULL, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
-			else if (join_ch->get_mode_invite())
+			//invite이 활성화되어 있고, 초대가 되어있는지 확인함
+			else if (join_ch->get_mode_invite() && !join_ch->check_cli_in_invite_cli_set(cli))
 				ft_send(ERR_INVITEONLYCHAN, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+i)", cli, true);
 			else
 			{

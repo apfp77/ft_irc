@@ -20,6 +20,8 @@
 
 //isdigit
 #include <cctype>
+//errno
+#include <cerrno>
 
 #define MAXCLIENT 20
 #define SERVER_NAME "FT_IRC "
