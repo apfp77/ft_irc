@@ -95,7 +95,7 @@ int ft_mode_execute_limit(Channel *ch, char &flag, std::string &num, std::string
 	else if (flag == '-')
 	{
 		messages[0] += 'l';
-		ch->set_mode_key(false);
+		ch->set_mode_limit(false);
 		ch->set_cli_limit(0);
 	}
 	return (0);
@@ -149,7 +149,7 @@ void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client 
 				}
 				break;
 			case 'l':
-				if (mode_argv_idx < recv_vector.size())
+				if (mode_argv_idx < recv_vector.size() || flag == '-')
 				{
 					mode_argv_idx += ft_mode_execute_limit(ch, flag, recv_vector[mode_argv_idx], messages);
 				}
