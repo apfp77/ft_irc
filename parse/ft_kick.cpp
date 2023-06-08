@@ -160,7 +160,7 @@ static std::string merge_explain_message(std::vector<std::string> &recv_vector, 
 	std::string message;
 
 	message.append(recv_vector[3]);
-	if (max == 4 && recv_vector[4].length() == 1)
+	if (max == 4 && recv_vector[3].length() == 1)
 	{
 		message.append(cli_nick);
 		return (message);
