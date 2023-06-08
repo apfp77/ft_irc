@@ -50,6 +50,8 @@ class Mode  {
 
 		std::string total_mode_string();
 
+		bool check_cli_in_invite_cli_set(Client *cli);
+
 		Mode();
 
 		~Mode();
