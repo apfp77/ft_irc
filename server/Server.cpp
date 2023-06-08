@@ -350,5 +350,3 @@ Server::~Server()
 	system("leaks ircserv");
 	std::cout << "종료" << std::endl;
 }
-
-Server::Server(){}
