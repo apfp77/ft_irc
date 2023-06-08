@@ -26,6 +26,11 @@ void signal_handle(int sig_num)
 	}
 }
 
+// std::string find_error(int a)
+// {
+
+// }
+
 int main(int argc, char **argv)
 {
 	signal(SIGINT, signal_handle);
@@ -44,9 +49,8 @@ int main(int argc, char **argv)
 		server.make_event_window();
 		server.execute();
 	}
-	catch (int a)
+	catch (const char *str)
 	{
-		std::cout << "ERROR: " << a << std::endl;
+		std::cout << "ERROR: " << str << "\nerrno: " << errno << std::endl;
 	}
 }
-	
