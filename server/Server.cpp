@@ -88,8 +88,7 @@ void Server::setting_socket(int srv_sock)
 void Server::make_event_window()
 {
 	fds[0].fd = this->srv_sock;
-	fds[0].events = POLLIN;
-	fds[1].events = POLLIN;
+	fds[0].events = POLLIN | POLLERR | POLLHUP;
 	for (int i = 1; i < MAXCLIENT + 1; ++i)
 		fds[i].fd = -1;
 }
@@ -114,7 +113,9 @@ void Server::execute()
 				// std::cout << "연결했음" << std::endl;
 				accept_client();
 			}
-			for (int i = 2; i < MAXCLIENT + 1; i++)
+			if (fds[0].revents & POLLHUP || fds[0].revents & POLLERR)
+				break ;
+			for (int i = 1; i < MAXCLIENT + 1; i++)
 			{
 				// std::cout << i << ": " << fds[i].revents << " 상태보고" << std::endl;
 				if (fds[i].fd == -1)
@@ -160,7 +161,7 @@ void Server::accept_client()
 
 struct pollfd &Server::find_vacant_fds()
 {
-	for(int i = 2; i < MAXCLIENT + 1; i++)
+	for(int i = 1; i < MAXCLIENT + 1; i++)
 	{
 		if (this->fds[i].fd == -1)
 		{
@@ -349,3 +350,5 @@ Server::~Server()
 	system("leaks ircserv");
 	std::cout << "종료" << std::endl;
 }
+
+Server::Server(){}

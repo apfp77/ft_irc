@@ -72,7 +72,6 @@ class Server {
 		void password_err_message(Client *cli);
 		pollfd* find_fds(int socket_num);
 		~Server();
-
 };
 
 #endif
