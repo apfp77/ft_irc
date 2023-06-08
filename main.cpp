@@ -15,18 +15,22 @@
 #define MAX_CLIENTS 10
 #include <unistd.h>
 
+bool program_down = false;
 
-// void signal_handle(int sig_num)
-// {
-// 	if (sig_num == SIGINT || sig_num == SIGQUIT)
-// 		return ;
-// }
+void signal_handle(int sig_num)
+{
+	if (sig_num == SIGINT || sig_num == SIGQUIT)
+	{
+		program_down = true;
+		return ;
+	}
+}
 
 int main(int argc, char **argv)
 {
-	// signal(SIGINT, signal_handle);
-	// signal(SIGTERM, signal_handle);
-	// signal(SIGQUIT, signal_handle);
+	signal(SIGINT, signal_handle);
+	signal(SIGTERM, signal_handle);
+	signal(SIGQUIT, signal_handle);
 	if (argc != 3)
 	{
 		std::cout << "input ./ircserv <port> <password>" << '\n';
