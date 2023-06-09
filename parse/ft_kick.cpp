@@ -82,7 +82,7 @@ static void make_up_data(std::vector<std::string> &recv_vector, Client *cli, Ser
 	init_k_data(k_data);
 	k_data.nick = cli->get_nick_name();
 	k_data.parameters = recv_vector.size();
-	if (k_data.parameters <= 3)
+	if (k_data.parameters <= 2)
 		k_data.check_parameter = false;
 	else
 	{
@@ -157,19 +157,25 @@ static std::string merge_kick_channel_message(std::vector<std::string> &recv_vec
 
 static std::string merge_explain_message(std::vector<std::string> &recv_vector, std::string cli_nick, int max)
 {
-	std::string message;
+	std::string message = "";
 
-	message.append(recv_vector[3]);
 	if (max == 4 && recv_vector[3].length() == 1)
 	{
-		message.append(cli_nick);
+		message.append(recv_vector[3]);
+		if (recv_vector[3].compare(":") == 0)
+		{
+			message.append(cli_nick);
+		}
 		return (message);
 	}
-	for (int i = 4; i < max; i++)
+	if (max >= 4)
 	{
-		message.append(recv_vector[i]);
-		if (!(i == max - 1))
-			message.append(" ");
+		for (int i = 3; i < max; i++)
+		{
+			message.append(recv_vector[i]);
+			if (!(i == max - 1))
+				message.append(" ");
+		}
 	}
 	return (message);
 }
