@@ -46,6 +46,7 @@ void Server::parse_map_init()
 	parse_map["QUIT"] = 10;
 	parse_map["INVITE"] = 11;
 	parse_map["CAP"] = 12;
+	parse_map["PART"] = 13;
 }
 
 void Server::init()

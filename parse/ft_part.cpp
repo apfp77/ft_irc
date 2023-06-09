@@ -2,11 +2,11 @@
 
 #define siz_t std::vector<std::string>::size_type
 
-typedef struct s_err_box
+typedef struct s_msg_box
 {
-	std::string err_code;
+	std::string message;
 	std::string err_message;
-} t_err_box;
+} t_msg_box;
 
 class c_part_data
 {
@@ -14,24 +14,30 @@ class c_part_data
 		std::vector<std::string> channel_names;
 		std::string cli_nick;
 		std::string explain;
+		siz_t ch_max;
 		siz_t max;
 	public:
+		t_msg_box msg_box;
 		c_part_data(std::vector<std::string> &recv_vector, Client *cli)
 		{
-			t_err_box err_box;
 			this->cli_nick = cli->get_nick_name();
 			this->max = recv_vector.size();
+			this->msg_box.message = "";
+			this->msg_box.err_message = "";
 			if (this->max <= 1)
 			{
-				err_box.err_code = ERR_NEEDMOREPARAMS;
-				err_box.err_message = cli_nick;
-				err_box.err_message.append(" PART");
-				err_box.err_message.append(" :Not enough parameters");
-				throw (err_box);
+				msg_box.err_message.append(": ");
+				msg_box.err_message.append(ERR_NEEDMOREPARAMS);
+				msg_box.err_message.append(" ");
+				msg_box.err_message.append(cli_nick);
+				msg_box.err_message.append(" PART");
+				msg_box.err_message.append(" :Not enough parameters\r\n");
+				throw(msg_box.err_message);
 			}
 			else
 			{
 				channel_names = ft_split(recv_vector[1], ",");
+				ch_max = channel_names.size();
 				if (this->max == 3 && recv_vector[2].length() == 1)
 					this->explain = recv_vector[2].append(cli_nick);
 				else
@@ -45,84 +51,87 @@ class c_part_data
 		siz_t get_size(){ return (this->max); }
 		std::string get_channel_name(siz_t i){ return (this->channel_names[i]); }
 		std::string get_nick_name(){ return (this->cli_nick); }
-		std::string merge_send_message(std::string &channel_name) 
+		siz_t get_channel_size() {return (this->ch_max);}
+		
+		void part_success_message(std::string &channel_name) 
 		{
-			std::string send_message;
-			send_message.append(":");
-			send_message.append(this->cli_nick);
-			send_message.append(" ");
-			send_message.append("PART");
-			send_message.append(" ");
-			send_message.append(channel_name);
-			send_message.append(" ");
-			send_message.append(this->explain);
-			return (send_message);
+			msg_box.message.append(":");
+			msg_box.message.append(this->cli_nick);
+			msg_box.message.append(" ");
+			msg_box.message.append("PART");
+			msg_box.message.append(" ");
+			msg_box.message.append(channel_name);
+			msg_box.message.append(" ");
+			msg_box.message.append(this->explain);
+			msg_box.message.append("\r\n");
 		}
 		
 };
 
-static void check_exist_channal(Channel *channel, c_part_data &p_data, std::string &channel_name);
-static void check_channel_in_cil(Channel *channel, Client *cli, c_part_data &p_data, std::string &channel_name);
+static bool check_exist_channal(Channel *channel, c_part_data &p_data, std::string &channel_name);
+static bool check_channel_in_cil(Channel *channel, Client *cli, c_part_data &p_data, std::string &channel_name);
 
 void ft_part(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	try
 	{
 		c_part_data p_data = c_part_data(recv_vector, cli);
-		siz_t max = p_data.get_size();
-		for (size_t i = 0; i < max; i++)
+		siz_t max = p_data.get_channel_size();
+
+		for (siz_t i = 0; i < max; i++)
 		{
-			try
+			std::string channel_name = p_data.get_channel_name(i);
+			Channel *channel = serv.find_ch_with_ch_name(channel_name);
+			if (check_exist_channal(channel, p_data, channel_name))
+				continue;
+			if (check_channel_in_cil(channel, cli, p_data, channel_name))
+				continue;
+			p_data.part_success_message(channel_name);
+			channel->send_to_ch(p_data.msg_box.message, cli);
+			channel->delete_gm_cli_and_cli(cli);
+			if (channel->get_cli_lst_size() == 0)
 			{
-				std::string channel_name = p_data.get_channel_name(i);
-				Channel *channel = serv.find_ch_with_ch_name(channel_name);
-				check_exist_channal(channel, p_data, channel_name);
-				check_channel_in_cil(channel, cli, p_data, channel_name);
-				std::string send_message = p_data.merge_send_message(channel_name);
-				channel->all_send_to_ch(send_message);
-				channel->delete_gm_cli_and_cli(cli);
-				if (channel->get_cli_lst_size() == 0)
-				{
-					serv.delete_ch(channel);
-					delete channel;
-				}
-			}
-			catch (t_err_box err_box)
-			{
-				ft_send(err_box.err_code, err_box.err_message, cli, true);
+				serv.delete_ch(channel);
+				delete channel;
 			}
 		}
+		ft_send("", p_data.msg_box.message + p_data.msg_box.err_message, cli, false);
 	}
-	catch (t_err_box err_box)
+	catch(const char *e)
 	{
-		ft_send(err_box.err_code, err_box.err_message, cli, true);
+		ft_send("", e, cli, false);
+		return ;
 	}
 }
 
-void check_exist_channal(Channel *channel, c_part_data &p_data, std::string &channel_name)
+bool check_exist_channal(Channel *channel, c_part_data &p_data, std::string &channel_name)
 {
 	if (channel == NULL)
 	{
-		t_err_box err_box;
-		err_box.err_code = ERR_NOSUCHCHANNEL;
-		err_box.err_message = p_data.get_nick_name();
-		err_box.err_message.append(" ");
-		err_box.err_message.append(channel_name);
-		err_box.err_message.append(" :No such channel");
-		throw (err_box);
+		p_data.msg_box.err_message.append(":");
+		p_data.msg_box.err_message.append(ERR_NOSUCHCHANNEL);
+		p_data.msg_box.err_message.append(" ");
+		p_data.msg_box.err_message.append(p_data.get_nick_name());
+		p_data.msg_box.err_message.append(" ");
+		p_data.msg_box.err_message.append(channel_name);
+		p_data.msg_box.err_message.append(" :No such channel\r\n");
+		return (true);
 	}
+	return (false);
 }
 
-void check_channel_in_cil(Channel *channel, Client *cli, c_part_data &p_data, std::string &channel_name)
+bool check_channel_in_cil(Channel *channel, Client *cli, c_part_data &p_data, std::string &channel_name)
 {
 	if (channel->find_cli_in_ch(cli) == NULL)
 	{
-		t_err_box err_box;
-		err_box.err_code = ERR_NOSUCHCHANNEL;
-		err_box.err_message = p_data.get_nick_name();
-		err_box.err_message.append(" ");
-		err_box.err_message.append(channel_name);
-		err_box.err_message.append(" :You're not on that channel");
-		throw (err_box);
+		p_data.msg_box.err_message.append(":");
+		p_data.msg_box.err_message.append(ERR_NOTONCHANNEL);
+		p_data.msg_box.err_message.append(" ");
+		p_data.msg_box.err_message.append(p_data.get_nick_name());
+		p_data.msg_box.err_message.append(" ");
+		p_data.msg_box.err_message.append(channel_name);
+		p_data.msg_box.err_message.append(" :You're not on that channel\r\n");
+		return (true);
 	}
+	return (false);
 }
