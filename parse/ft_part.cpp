@@ -32,7 +32,7 @@ class c_part_data
 				msg_box.err_message.append(cli_nick);
 				msg_box.err_message.append(" PART");
 				msg_box.err_message.append(" :Not enough parameters\r\n");
-				throw(msg_box.err_message);
+				throw(msg_box.err_message.c_str());
 			}
 			else
 			{
@@ -95,11 +95,11 @@ void ft_part(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 				delete channel;
 			}
 		}
-		ft_send("", p_data.msg_box.message + p_data.msg_box.err_message, cli, false);
+		ft_send("", p_data.msg_box.message + p_data.msg_box.err_message, cli);
 	}
 	catch(const char *e)
 	{
-		ft_send("", e, cli, false);
+		ft_send("", e, cli);
 		return ;
 	}
 }

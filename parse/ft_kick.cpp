@@ -68,12 +68,12 @@ void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		}
 		catch(t_err_box err_box)
 		{
-			ft_send(err_box.err_code, err_box.err_message, cli, true);
+			ft_send(err_box.err_code, err_box.err_message, cli);
 		}
 	}
 	catch(t_err_box err_box)
 	{
-		ft_send(err_box.err_code, err_box.err_message, cli, true);
+		ft_send(err_box.err_code, err_box.err_message, cli);
 	}
 }
 

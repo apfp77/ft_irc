@@ -29,7 +29,7 @@ int ft_mode_execute_key(Channel *ch, char &flag, Client *cli, std::string &key, 
 		{
 			if (!isprint(key[j]))
 			{
-				ft_send(ERR_INVALIDKEY, ch->get_ch_name() + " :Key is not well-formed", cli, false);
+				ft_send(ERR_INVALIDKEY, ch->get_ch_name() + " :Key is not well-formed", cli);
 				return (1);
 			}
 		}
@@ -59,7 +59,7 @@ void ft_mode_execute_operator(Channel *ch, char &flag, Client *cli, std::string 
 	Client *user = ch->find_cli_in_ch_by_str(nick_name);
 	if (user == NULL)
 	{
-		ft_send(ERR_USERNOTINCHANNEL,  cli->get_nick_name() + " " + nick_name + " " + ch->get_ch_name() + " :They aren't on that channel", cli, true);
+		ft_send(ERR_USERNOTINCHANNEL,  cli->get_nick_name() + " " + nick_name + " " + ch->get_ch_name() + " :They aren't on that channel", cli);
 		return ;
 	}
 	if (flag == '+')
@@ -120,7 +120,7 @@ void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client 
 			messages[0] += flag;
 			if (flag != '+' && flag != '-')
 			{
-				ft_send(ERR_UNKNOWNMODE, cli->get_nick_name() + " " + recv_vector[2][idx] + " :is unknown mode char to me", cli, false);
+				ft_send(ERR_UNKNOWNMODE, cli->get_nick_name() + " " + recv_vector[2][idx] + " :is unknown mode char to me", cli);
 				flag = '\0';
 				messages[0].erase(messages[0].end() - 1); 
 			}
@@ -155,7 +155,7 @@ void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client 
 				}
 				break;
 			default:
-				ft_send(ERR_UNKNOWNMODE, cli->get_nick_name() + " " + recv_vector[2][idx] + " :is unknown mode char to me", cli, false);
+				ft_send(ERR_UNKNOWNMODE, cli->get_nick_name() + " " + recv_vector[2][idx] + " :is unknown mode char to me", cli);
 				break;
 		}
 		idx++;
@@ -180,15 +180,15 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	*/
 	if (recv_vector.size() < 2 || return_string_type(recv_vector[1]) != CHANNEL)
 	{
-		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli, true);
+		ft_send(ERR_NOSUCHCHANNEL, ":No such channel", cli);
 		return ;
 	}
 	std::string ch_name = recv_vector[1];
 	Channel *ch = serv.find_ch_with_ch_name(ch_name);
 	if (recv_vector.size() < 3)
-		ft_send(RPL_CHANNELMODEIS, cli->get_nick_name() + " " + ch_name + " " + ch->total_mode_string() , cli, false);
+		ft_send(RPL_CHANNELMODEIS, cli->get_nick_name() + " " + ch_name + " " + ch->total_mode_string() , cli);
 	else if (ch->find_cli_in_gm_lst(cli) == false)
-		ft_send(ERR_CHANOPRIVSNEEDED, cli->get_nick_name() + " " + ch_name + " :You're not channel operator" , cli, false);
+		ft_send(ERR_CHANOPRIVSNEEDED, cli->get_nick_name() + " " + ch_name + " :You're not channel operator" , cli);
 	else
 		ft_mode_execute(recv_vector, ch, cli, messages);
 	if (messages[0].length() != 0)

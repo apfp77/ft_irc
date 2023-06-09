@@ -16,9 +16,9 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 	if (recv_size < 3)
 	{
 		if (recv_size < 2)
-			ft_send(ERR_NORECIPIENT, ":No recipient given", cli, true);
+			ft_send(ERR_NORECIPIENT, ":No recipient given", cli);
 		else
-			ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli, true);
+			ft_send(ERR_NOTEXTTOSEND, ":No text to send", cli);
 		return ;
 	}
 
@@ -36,7 +36,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 			if (privmsg_ch == NULL 
 				|| privmsg_ch->find_cli_in_ch(cli) == NULL)
 			{
-				ft_send(ERR_CANNOTSENDTOCHAN, ":Cannot send to channel", cli, true);
+				ft_send(ERR_CANNOTSENDTOCHAN, ":Cannot send to channel", cli);
 				return ;
 			}
 			
@@ -51,13 +51,13 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 			Client *privmsg_cli = serv.find_cli_with_nick_name(nick_name);
 			if (privmsg_cli == NULL)
 			{
-				ft_send(ERR_NOSUCHNICK, ":No such nick/channel", cli, true);
+				ft_send(ERR_NOSUCHNICK, ":No such nick/channel", cli);
 				return ;
 			}
 			std::string message = ":" + cli->get_nick_name() + " PRIVMSG " + nick_name + " ";
 			for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
 				message += recv_vector[i];
-			ft_send("", message, privmsg_cli, false);
+			ft_send("", message, privmsg_cli);
 		}
 	}
 }

@@ -97,14 +97,13 @@ void Channel::send_to_ch(std::string &message, Client *cli)
 	for (; it != this->cli_lst.end(); ++it)
 	{
 		if ((*it) != cli)
-			ft_send("", message, (*it), false);
+			ft_send("", message, (*it));
 	}
 }
 
 std::string Channel::get_topic() const { return (this->topic_message); }
-void Channel::set_topic(Client *cli, std::string &new_message)
+void Channel::set_topic(std::string new_message)
 {
-	(void)cli;
 	this->topic_message = new_message;
 }
 
@@ -113,7 +112,7 @@ void Channel::all_send_to_ch(std::string &message)
 	std::set<Client *>::iterator it = this->cli_lst.begin();
 	for (; it != this->cli_lst.end(); ++it)
 	{
-		ft_send("", message, (*it), false);
+		ft_send("", message, (*it));
 	}
 }
 

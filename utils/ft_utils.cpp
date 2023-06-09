@@ -12,11 +12,9 @@ bool string_isalnum(std::string &s)
 	return (true);
 }
 
-void ft_send(std::string code, std::string s, Client *cli, bool err)
+void ft_send(std::string code, std::string s, Client *cli)
 {
 	std::string ret = "";
-	if (err)
-		ret += "ERROR ";
 	if (code.compare(""))
 		ret = code + " ";
 	ret = ret + s + "\r\n";

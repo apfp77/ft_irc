@@ -13,17 +13,18 @@ bool ft_connect_nick(std::vector<std::string> &recv_vector, Client *cli, Server 
 			&& !serv.find_cli_with_nick_name(recv_vector[1]) 
 			&& cli->pass_flag == true)
 	{
-		ft_send(RPL_WELCOME, recv_vector[1] + " :Welcome to the ft_irc Network " + recv_vector[1] , cli, false);
-		ft_send(RPL_YOURHOST, recv_vector[1] + " :Your nickname is " + recv_vector[1] + ", running version", cli, false);
+		ft_send(RPL_WELCOME, recv_vector[1] + " :Welcome to the ft_irc Network " + recv_vector[1] , cli);
+		ft_send(RPL_YOURHOST, recv_vector[1] + " :Your nickname is " + recv_vector[1] + ", running version", cli);
 		cli->set_nick_name(recv_vector[1]);
+		cli->nick_flag = true;
 		return (false);
 	}
 	if (recv_vector.size() != 2)
-		ft_send(ERR_NONICKNAMEGIVEN, ":No nickname given", cli, true);
+		ft_send(ERR_NONICKNAMEGIVEN, ":No nickname given", cli);
 	else if (!string_isalnum(recv_vector[1]))
-		ft_send(ERR_ERRONEUSNICKNAME, ":Erroneus nickname", cli, true);
+		ft_send(ERR_ERRONEUSNICKNAME, ":Erroneus nickname", cli);
 	else if (serv.find_cli_with_nick_name(recv_vector[1]))
-		ft_send(ERR_NICKNAMEINUSE, ":Nickname is already in use", cli, true);
+		ft_send(ERR_NICKNAMEINUSE, ":Nickname is already in use", cli);
 	if (cli->pass_flag == false)
 	{
 		pollfd *p_fd = serv.find_fds(cli->get_socket());
@@ -35,15 +36,14 @@ bool ft_connect_nick(std::vector<std::string> &recv_vector, Client *cli, Server 
 void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	if (recv_vector.size() != 2)
-		ft_send(ERR_NONICKNAMEGIVEN, ":No nickname given", cli, true);
+		ft_send(ERR_NONICKNAMEGIVEN, ":No nickname given", cli);
 	else if (!string_isalnum(recv_vector[1]))
-		ft_send(ERR_ERRONEUSNICKNAME, ":Erroneus nickname", cli, true);
+		ft_send(ERR_ERRONEUSNICKNAME, ":Erroneus nickname", cli);
 	else if (serv.find_cli_with_nick_name(recv_vector[1]))
-		ft_send(ERR_NICKNAMEINUSE, ":Nickname is already in use", cli, true);
+		ft_send(ERR_NICKNAMEINUSE, ":Nickname is already in use", cli);
 	else
 	{
-		ft_send(RPL_WELCOME, recv_vector[1] + " :Welcome to the ft_irc Network " + recv_vector[1] , cli, false);
-		ft_send(RPL_YOURHOST, recv_vector[1] + " :Your nickname is " + recv_vector[1] + ", running version", cli, false);
+		ft_send("", cli->get_nick_name() + " NICK :" + recv_vector[1], cli);
 		cli->set_nick_name(recv_vector[1]);
 	}
 }

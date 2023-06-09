@@ -31,7 +31,7 @@ void send_rpl_namreply(std::string &ch_name, Client *cli, std::string &users)
 	message += SERVER_NAME;
 	message += RPL_NAMREPLY;
 	message +=  " " + cli->get_nick_name() + " = " + ch_name + " :" + users;
-	ft_send("", message + users, cli, false);
+	ft_send("", message + users, cli);
 }
 
 void send_names_message(std::string &ch_name, Client *cli)
@@ -40,7 +40,7 @@ void send_names_message(std::string &ch_name, Client *cli)
 	message += SERVER_NAME;
 	message += RPL_ENDOFNAMES;
 	message += " " + cli->get_nick_name() + " " + ch_name + " :End of /NAMES list";
-	ft_send("", message, cli, false);
+	ft_send("", message, cli);
 }
 
 /*
@@ -61,7 +61,7 @@ void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	if (recv_vector.size() < 1)
 	{
-		ft_send(ERR_NEEDMOREPARAMS, ":Not enough parameters", cli, true);
+		ft_send(ERR_NEEDMOREPARAMS, ":Not enough parameters", cli);
 		return ;
 	}
 	(void)serv;

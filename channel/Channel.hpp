@@ -59,7 +59,7 @@ class Channel : public Mode {
 		void delete_gm_cli_and_cli(Client *cli);
 
 		std::string get_topic() const;
-		void set_topic(Client *cli, std::string &new_message);
+		void set_topic(std::string new_message);
 
 		std::vector<std::string> get_cli_names_in_ch();
 };

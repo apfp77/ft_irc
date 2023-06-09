@@ -17,7 +17,18 @@ CHANNEL_SRCS:= Channel.cpp Mode.cpp
 CHANNEL_OBJS := $(addprefix $(CHANNEL_DIR)/,$(CHANNEL_SRCS:.cpp=.o))
 
 PARSE_DIR:= parse
-PARSE_SRCS:= parse.cpp ft_privmsg.cpp ft_mode.cpp ft_kick.cpp ft_invite.cpp ft_nick.cpp ft_names.cpp ft_part.cpp
+PARSE_SRCS:= ft_invite.cpp \
+						ft_nick.cpp \
+						ft_topic.cpp \
+						ft_join.cpp \
+						ft_part.cpp \
+						parse.cpp \
+						ft_kick.cpp \
+						ft_pass.cpp \
+						ft_mode.cpp \
+						ft_ping.cpp \
+						ft_names.cpp \
+						ft_privmsg.cpp
 PARSE_OBJS := $(addprefix $(PARSE_DIR)/,$(PARSE_SRCS:.cpp=.o))
 
 UTILS_DIR:= utils

@@ -4,6 +4,7 @@
 Client::Client() 
 { 
 	pass_flag = false;
+	nick_flag = false;
 	nick_name = "";
 	user_name = "";
 }

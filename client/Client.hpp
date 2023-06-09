@@ -32,6 +32,7 @@ class Client {
 		int append_submemory(char *str);
 		std::string division_cmd(int idx);
 		bool pass_flag;
+		bool nick_flag;
 		int get_socket() const;
 		void set_socket(int cli_sock);
 		void set_nick_name(std::string &nick_name);

@@ -91,7 +91,7 @@ void Server::execute()
 		if (check == -1)
 		{
 			if (errno == 4)
-				throw("signal exit");
+				throw(1);
 			throw("poll() error");
 		}
 		try
@@ -146,7 +146,6 @@ void Server::accept_client()
 			close(cli->get_socket());
 			throw ;
 		}
-		
 	}
 	catch(const char *str)
 	{
@@ -295,7 +294,7 @@ Channel* Server::find_ch_with_ch_name(std::string &channel_name)
 
 void Server::password_err_message(Client *cli)
 {
-	ft_send(ERR_PASSWDMISMATCH, "your_client :Password incorrect", cli, true);
+	ft_send(ERR_PASSWDMISMATCH, "your_client :Password incorrect", cli);
 }
 
 bool Server::check_pass_flag_cli_exit(Client *cli)

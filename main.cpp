@@ -41,16 +41,28 @@ int main(int argc, char **argv)
 		std::cout << "input ./ircserv <port> <password>" << '\n';
 		return (ERROR);
 	}
-	try
+	while (true)
 	{
-		Server server(argv[1], argv[2]);
-		server.parse_map_init();
-		server.init();
-		server.make_event_window();
-		server.execute();
-	}
-	catch (const char *str)
-	{
-		std::cout << "ERROR: " << str << "\nerrno: " << errno << std::endl;
+		try
+		{
+			Server server(argv[1], argv[2]);
+			server.parse_map_init();
+			server.init();
+			server.make_event_window();
+			server.execute();
+		}
+		catch (int e)
+		{
+			std::cout << "EXIT" << '\n';
+			return (0);
+		}
+		catch (const char *str)
+		{
+			std::cout << "ERROR: " << str << "\nerrno: " << errno << std::endl;
+		}
+		catch (std::exception &e)
+		{
+			std::cout << e.what() << '\n';
+		}
 	}
 }
