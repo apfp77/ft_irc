@@ -22,9 +22,6 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 		return ;
 	}
 
-	/*
-		타겟별로 스플릿해서 전송
-	*/
 	std::vector<std::string> target_split = ft_split(recv_vector[1], ",");
 	for (std::vector<std::string>::size_type j = 0; j < target_split.size(); j++)
 	{

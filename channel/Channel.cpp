@@ -8,13 +8,6 @@ Channel::Channel(std::string &ch_name, Client *cli)
 	this->gm_lst.insert(cli);
 }
 
-// bool Channel::check_empty_channel()
-// {
-// 	if(this->cli_lst.size() == 0)
-// 		return (true);
-// 	return (false);
-// }
-
 void Channel::insert_cli(Client *cli) {	this->cli_lst.insert(cli);}
 
 void Channel::delete_cli(Client *cli) 

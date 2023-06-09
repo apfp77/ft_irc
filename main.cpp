@@ -7,7 +7,6 @@
 #include <exception>
 #include <signal.h>
 
-//isdigit
 #include <cctype>
 
 #define ERROR 1
@@ -25,11 +24,6 @@ void signal_handle(int sig_num)
 		return ;
 	}
 }
-
-// std::string find_error(int a)
-// {
-
-// }
 
 int main(int argc, char **argv)
 {
