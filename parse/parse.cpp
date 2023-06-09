@@ -117,20 +117,28 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		Channel *join_ch = serv.find_ch_with_ch_name(ch_split[i]);
 		if (join_ch == NULL)
 		{
-			join_ch = new Channel(ch_split[i], cli);
-			join_ch->insert_cli(cli);
-			join_ch->insert_cli_gm(cli);
-			join_ch->set_passwd(pw_split[i]);
-			topic = "";
-			join_ch->set_topic(cli, topic);
-			serv.insert_ch(join_ch);
-			ret_join_after_names_message(join_ch, cli);
+			try
+			{
+				join_ch = new Channel(ch_split[i], cli);
+				join_ch->insert_cli(cli);
+				join_ch->insert_cli_gm(cli);
+				join_ch->set_passwd(pw_split[i]);
+				topic = "";
+				join_ch->set_topic(cli, topic);
+				serv.insert_ch(join_ch);
+				ret_join_after_names_message(join_ch, cli);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << "Cannnot join the channel :" << e.what() << std::endl;
+				ft_send(ERR_TOOMANYCHANNELS, "IRSSI " + ch_split[i] + " :You have joined too many channels", cli, true);
+			}
 		}
 		else
 		{
 			if (join_ch->get_passwd().size() > 1 && join_ch->get_passwd() != pw_split[i] && !join_ch->check_cli_in_invite_cli_set(cli))
 				ft_send(ERR_BADCHANNELKEY, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+k)", cli, true);
-			else if (join_ch->get_cli_limit() > 0 && join_ch->get_cli_limit() < (static_cast<int>(join_ch->get_cli_lst_size())))
+			else if (join_ch->get_mode_limit() && join_ch->get_cli_limit() <= (static_cast<int>(join_ch->get_cli_lst_size())))
 				ft_send(ERR_CHANNELISFULL, "IRSSI " + join_ch->get_ch_name() + " :Cannot join channel (+l)", cli, true);
 			//invite이 활성화되어 있고, 초대가 되어있는지 확인함
 			else if (join_ch->get_mode_invite() && !join_ch->check_cli_in_invite_cli_set(cli))
@@ -222,6 +230,9 @@ void parse(std::string recv, Client *cli, Server &serv)
 					break;
 				case INVITE:
 					ft_invite(recv_vector, cli, serv);
+					break;
+				case PART:
+					ft_part(recv_vector, cli, serv);
 					break;
 				default:
 					ft_send(ERR_NOTREGISTERED, ":You have not registered", cli, true);
