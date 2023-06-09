@@ -346,3 +346,18 @@ Server::~Server()
 	system("leaks ircserv");
 	std::cout << "종료" << std::endl;
 }
+
+
+std::set<Channel *> Server::find_cli_in_channels(Client *cli)
+{
+	std::set<Channel *> client_in_channels;
+	std::set<Channel *>::iterator it = this->ch_set.begin();
+
+	for (;it != ch_set.end(); ++it)
+	{
+		if ((*it)->find_cli_in_ch(cli) != NULL)
+			client_in_channels.insert((*it));
+	}
+	return (client_in_channels);
+}
+

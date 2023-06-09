@@ -44,6 +44,11 @@ void ft_nick(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	else
 	{
 		ft_send("", cli->get_nick_name() + " NICK :" + recv_vector[1], cli);
+		std::set<Channel *> channels = serv.find_cli_in_channels(cli);
+		std::set<Channel *>::iterator it= channels.begin();
+		std::string message = ":" + cli->get_nick_name()+ "!ft_irc@ft_irc" + " NICK :" + recv_vector[1];
+		for (; it != channels.end(); ++it)
+			(*it)->all_send_to_ch(message);
 		cli->set_nick_name(recv_vector[1]);
 	}
 }

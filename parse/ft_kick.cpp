@@ -98,7 +98,7 @@ static void make_up_data(std::vector<std::string> &recv_vector, Client *cli, Ser
 				k_data.im_operator = false;
 		}
 			k_data.erase_user_name = ft_split(recv_vector[2], ",");
-			k_data.send_first_mention = merge_kick_channel_message(recv_vector);
+			k_data.send_first_mention = ":"+ k_data.nick + "!ft_irc@ft_irc " + merge_kick_channel_message(recv_vector);
 			k_data.explain = merge_explain_message(recv_vector, k_data.nick, k_data.parameters);
 	}
 }
@@ -205,7 +205,7 @@ static void check_parameter(t_kick_data &k_data)
 		t_err_box err_box;
 		err_box.err_code = ERR_NEEDMOREPARAMS;
 		err_box.err_message.append(k_data.nick);
-		err_box.err_message.append(" /KICK");
+		err_box.err_message.append(" KICK");
 		err_box.err_message.append(" :Not enough parameters");
 		throw (err_box);
 	}
