@@ -5,7 +5,7 @@
 #include "Server.hpp"
 #include <unistd.h>
 #include <vector>
-//isalnum
+
 #include <ctype.h>
 #include "Numerics.hpp"
 #include "ft_utils.hpp"
@@ -36,13 +36,12 @@ void ft_names(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
-void ft_join_tmp(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_kick(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
-void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_quit(Client *cli);
 void ft_invite(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
-void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
 void ft_part(std::vector<std::string> &recv_vector, Client *cli, Server &serv);
+void ft_cap();
 /*
 	names
 */

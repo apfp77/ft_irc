@@ -18,9 +18,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-//isdigit
 #include <cctype>
-//errno
 #include <cerrno>
 
 #define MAXCLIENT 20

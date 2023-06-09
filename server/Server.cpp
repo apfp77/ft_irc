@@ -343,7 +343,6 @@ Server::~Server()
 	for (; cli_it != this->cli_set.end(); ++cli_it)
         delete (*cli_it);
 	close(this->srv_sock);
-	system("leaks ircserv");
 	std::cout << "종료" << std::endl;
 }
 

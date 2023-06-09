@@ -63,10 +63,7 @@ void Mode::invite_cli_all_clean()
 	}	
 }
 
-Mode::~Mode()
-{
-
-}
+Mode::~Mode(){}
 
 bool Mode::check_cli_in_invite_cli_set(Client *cli)
 {

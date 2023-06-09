@@ -4,12 +4,12 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 {
 	if (recv_vector.size() < 1)
 	{
-		ft_send(ERR_NOSUCHCHANNEL, ":No such channel" + recv_vector[1] , cli);
+		ft_send(ERR_NOSUCHCHANNEL, cli->get_nick_name() + "!ft_irc@ft_irc" + " :No such channel" + recv_vector[1] , cli);
 		return ;
 	}
 	else if (recv_vector.size() < 2 || recv_vector[2][0] == ':')
 	{
-		ft_send(ERR_NEEDMOREPARAMS, recv_vector[1] + " :Not enough parameters", cli);
+		ft_send(ERR_NEEDMOREPARAMS, cli->get_nick_name() + "!ft_irc@ft_irc" + " :Not enough parameters", cli);
 		return ;
 	}
 	std::vector <std::string> ch_split = ft_split(recv_vector[1], ",");
@@ -39,16 +39,16 @@ void ft_join(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		else
 		{
 			if (join_ch->get_passwd().size() > 1 && join_ch->get_passwd() != pw_split[i] && !join_ch->check_cli_in_invite_cli_set(cli))
-				ft_send(ERR_BADCHANNELKEY, cli->get_nick_name() + " " + join_ch->get_ch_name() + " :Cannot join channel (+k)", cli);
+				ft_send(ERR_BADCHANNELKEY, cli->get_nick_name() + "!ft_irc@ft_irc"+ " " + join_ch->get_ch_name() + " :Cannot join channel (+k)", cli);
 			else if (join_ch->get_mode_limit() && join_ch->get_cli_limit() <= (static_cast<int>(join_ch->get_cli_lst_size())))
-				ft_send(ERR_CHANNELISFULL, cli->get_nick_name() + " " + join_ch->get_ch_name() + " :Cannot join channel (+l)", cli);
+				ft_send(ERR_CHANNELISFULL, cli->get_nick_name() + "!ft_irc@ft_irc"+ " " + join_ch->get_ch_name() + " :Cannot join channel (+l)", cli);
 			//invite이 활성화되어 있고, 초대가 되어있는지 확인함
 			else if (join_ch->get_mode_invite() && !join_ch->check_cli_in_invite_cli_set(cli))
-				ft_send(ERR_INVITEONLYCHAN, cli->get_nick_name() + " " + join_ch->get_ch_name() + " :Cannot join channel (+i)", cli);
+				ft_send(ERR_INVITEONLYCHAN, cli->get_nick_name() + "!ft_irc@ft_irc"+ " " + join_ch->get_ch_name() + " :Cannot join channel (+i)", cli);
 			else
 			{
 				if (join_ch->get_topic() != "")
-					ft_send(RPL_TOPIC, cli->get_nick_name() + " " + join_ch->get_ch_name() + " :" + join_ch->get_topic(), cli);
+					ft_send(RPL_TOPIC, cli->get_nick_name() + "!ft_irc@ft_irc" + " " + join_ch->get_ch_name() + " :" + join_ch->get_topic(), cli);
 				join_ch->insert_cli(cli);
 				ret_join_after_names_message(join_ch, cli);
 			}

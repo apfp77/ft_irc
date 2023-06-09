@@ -1,19 +1,13 @@
 #include "parse.hpp"
 
-void ft_quit(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+void ft_quit(Client *cli)
 {
-	if (recv_vector.size() == 1)
-
-	(void)recv_vector;
-	(void)cli;
-	(void)serv;
+	std::cout << cli->get_nick_name() + "클라이언트 종료" << '\n';
 }
 
-void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
+void ft_cap()
 {
-	(void)recv_vector;
-	(void)cli;
-	(void)serv;
+	std::cout << "새로운 클라이언트 접속" << '\n';
 }
 
 /*
@@ -25,11 +19,6 @@ void ft_cap(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 */
 void parse(std::string recv, Client *cli, Server &serv)
 {
-	/*
-		Todo
-		인증 전에 PING과 QUIT, 등록되지 않은 명령어를 제외한 명령어가 들어오면
-		클라이언트와의 연결을 끊는다
-	*/
 	std::vector <std::vector<std::string> > parse_split;
 	std::vector <std::string> recv_vector;
 	recv_vector = ft_split(recv, "\r\n");
@@ -71,7 +60,7 @@ void parse(std::string recv, Client *cli, Server &serv)
 					ft_kick(recv_vector, cli, serv);
 					break;
 				case QUIT:
-					ft_quit(recv_vector, cli, serv);
+					ft_quit(cli);
 					break;
 				case INVITE:
 					ft_invite(recv_vector, cli, serv);
@@ -94,7 +83,7 @@ void parse(std::string recv, Client *cli, Server &serv)
 						return ;
 					break;
 				case CAP:
-					ft_cap(recv_vector, cli, serv);
+					ft_cap();
 					break;
 				case NICK:
 					if (ft_connect_nick(recv_vector, cli, serv))

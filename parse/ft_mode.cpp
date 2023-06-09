@@ -101,10 +101,6 @@ int ft_mode_execute_limit(Channel *ch, char &flag, std::string &num, std::string
 	return (0);
 }
 
-/*
-	Todo
-	* 옵션별로 메세지를 쪼개서 보내는것이 아니라 에러옵션이나 상황을 뺀 나머지를 합쳐서 보냄 - 수정예정
-*/
 void ft_mode_execute(std::vector<std::string> &recv_vector, Channel *ch, Client *cli, std::string (&messages)[2])
 {
 	std::vector<std::string>::size_type mode_argv_idx = 3;
