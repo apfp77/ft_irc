@@ -66,6 +66,7 @@ class Server {
 		
 		Channel* find_ch_with_ch_name(std::string &channel_name);
 		Client* find_cli_with_nick_name(std::string &nick_name);
+		std::set<Channel *> find_cli_in_channels(Client *cli);
 
 		std::set<Channel *>::size_type get_ch_set_size() const;
 		std::set<Client *>::size_type get_cli_set_size() const;

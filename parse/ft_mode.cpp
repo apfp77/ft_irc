@@ -193,7 +193,7 @@ void ft_mode(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 		ft_mode_execute(recv_vector, ch, cli, messages);
 	if (messages[0].length() != 0)
 	{
-		std::string send_mesasge = ":" + cli->get_nick_name() + " MODE " + ch->get_ch_name() + " ";
+		std::string send_mesasge = ":" + cli->get_nick_name() + "!ft_irc@ft_irc" + " MODE " + ch->get_ch_name() + " ";
 		int flag = false;
 		if (messages[0].length() > 1)
 		{

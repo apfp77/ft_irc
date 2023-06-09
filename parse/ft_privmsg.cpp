@@ -40,7 +40,7 @@ void ft_privmsg(std::vector<std::string> &recv_vector, Client *cli, Server &serv
 				return ;
 			}
 			
-			std::string message = ":" + cli->get_nick_name() + " PRIVMSG " + ch_name + " ";
+			std::string message = ":" + cli->get_nick_name() + "!ft_irc@ft_irc" + " PRIVMSG " + ch_name + " ";
 			for (std::vector<std::string>::size_type i = 2; i < recv_size; i++)
 				message += recv_vector[i];
 			privmsg_ch->send_to_ch(message, cli);

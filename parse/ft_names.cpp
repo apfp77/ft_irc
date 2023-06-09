@@ -2,7 +2,7 @@
 
 void send_input_cli_in_ch(Channel *ch, Client *cli)
 {
-	std::string ch_message = ":" + cli->get_nick_name() + " JOIN :" + ch->get_ch_name();
+	std::string ch_message = ":" + cli->get_nick_name() + "!ft_irc@ft_irc" + " JOIN :" + ch->get_ch_name();
 	ch->all_send_to_ch(ch_message);
 }
 
