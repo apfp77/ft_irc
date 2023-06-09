@@ -57,6 +57,7 @@ class c_part_data
 		{
 			msg_box.message.append(":");
 			msg_box.message.append(this->cli_nick);
+			msg_box.message.append("!ft_irc@ft_irc");
 			msg_box.message.append(" ");
 			msg_box.message.append("PART");
 			msg_box.message.append(" ");

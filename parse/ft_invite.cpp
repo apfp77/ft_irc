@@ -53,7 +53,7 @@ void ft_invite(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 	std::string message = ":";
 	message += SERVER_NAME;
 	message += RPL_INVITING;
-	message += " " + cli->get_nick_name() + " " + recv_vector[1] + " " + recv_vector[2];
+	message += " " + cli->get_nick_name()+ "!ft_irc@ft_irc" + " " + recv_vector[1] + " " + recv_vector[2];
 	ch->all_send_to_ch(message);
 	//노티스 추가해야할까?
 

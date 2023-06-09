@@ -34,7 +34,7 @@ void ft_topic(std::vector<std::string> &recv_vector, Client *cli, Server &serv)
 			return ;
 		}
 		topic_ch->set_topic(recv_vector[2]);
-		std::string s = ":" + cli->get_nick_name() + " TOPIC " + topic_ch->get_ch_name() + " :" + topic_ch->get_topic();
+		std::string s = ":" + cli->get_nick_name() + "!ft_irc@ft_irc" + " TOPIC " + topic_ch->get_ch_name() + " :" + topic_ch->get_topic();
 		ft_send("", s, cli);
 		topic_ch->send_to_ch(s, cli);
 	}

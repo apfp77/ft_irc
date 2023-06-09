@@ -22,9 +22,6 @@ void ft_send(std::string code, std::string s, Client *cli)
 	if (check == -1)
 	{ 
 		std::cerr << "Failed to send data" << std::endl;
-		/*
-			클라이언트 클래스 해제
-		*/
 	}
 }
 
